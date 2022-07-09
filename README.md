@@ -1,2 +1,2 @@
-# PrivateMessenerServer
-PrivateMessengerServer with Kafka
+# PrivateMessener-Server
+PrivateMessenger-Server with Kafka
