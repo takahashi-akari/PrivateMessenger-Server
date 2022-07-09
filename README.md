@@ -1,4 +1,4 @@
-# PrivateMessener-Server
+# PrivateMessenger-Server
 PrivateMessenger-Server with Kafka
 
 ## Description
