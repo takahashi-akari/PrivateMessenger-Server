@@ -5,7 +5,7 @@
 // @description This is a private messenger server.
 // @license MIT License <https://opensource.org/licenses/MIT>
 // @copyright (c) 2022 Takahashi Akari <akaritakahashioss@gmail.com>
-// @url <https://akari.mn/privatemessenger>
+// @url <https://takahashi-akari.github.io/PrivateMessenger/>
 // @see ./App.java
 
 package mn.akari.maven.privatemessengerserver;
