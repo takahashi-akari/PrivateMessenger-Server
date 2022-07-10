@@ -1,11 +1,11 @@
 // @title Private Messenger Server
-// @version 0.0.6
+// @version 0.0.7
 // @author Takahashi Akari <akaritakahashioss@gmail.com>
 // @date 2022-07-09
 // @description This is a private messenger server.
 // @license MIT License
 // @copyright (c) 2022 Takahashi Akari <akaritakahashioss@gmail.com>
-// @url <https://akari.mn/privatemessenger>
+// @url <https://takahashi-akari.github.io/PrivateMessenger/>
 // @see https://github.com/takahashi-akari/PrivateMessenger-Server/blob/main/privatemessengerserver/src/main/java/mn/akari/maven/privatemessengerserver/App.java
 // @see https://github.com/takahashi-akari/PrivateMessenger-Server/blob/main/privatemessengerserver/src/main/java/mn/akari/maven/privatemessengerserver/Constsans.java
 // @see https://github.com/takahashi-akari/PrivateMessenger-Server/blob/main/README.md
