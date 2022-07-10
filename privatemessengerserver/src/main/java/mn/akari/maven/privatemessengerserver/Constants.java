@@ -1,13 +1,18 @@
-// @title Private Messenger Server Constants
-// @version 0.0.7
+// @title Private Messenger Server - Constants
+// @version 0.0.8
 // @author Takahashi Akari <akaritakahashioss@gmail.com>
 // @date 2022-07-09
-// @description This is a private messenger server.
-// @license MIT License <https://opensource.org/licenses/MIT>
+// @description This is a private messenger server. This class contains constants.
+// @license MIT License
 // @copyright (c) 2022 Takahashi Akari <akaritakahashioss@gmail.com>
 // @url <https://takahashi-akari.github.io/PrivateMessenger/>
+// @see https://raw.githubusercontent.com/takahashi-akari/PrivateMessenger-Server/main/privatemessengerserver/src/main/java/mn/akari/maven/privatemessengerserver/App.java
+// @see https://raw.githubusercontent.com/takahashi-akari/PrivateMessenger-Server/main/privatemessengerserver/src/main/java/mn/akari/maven/privatemessengerserver/Constants.java
+// @see https://raw.githubusercontent.com/takahashi-akari/PrivateMessenger-Server/main/README.md
+// @see https://takahashi-akari.github.io/PrivateMessenger/
+// @see https://raw.githubusercontent.com/takahashi-akari/PrivateMessenger-Client/main/privatemessengerclient/src/main/java/mn/akari/maven/privatemessengerclient/Client.java
 // @see ./App.java
-
+    
 package mn.akari.maven.privatemessengerserver;
 
 import java.util.ArrayList;
@@ -35,6 +40,11 @@ public class Constants {
     public static final String MESSAGE_TYPE_ERROR = "error";
     // DELIMITER
     public static final String DELIMITER = ":";
+    // SPLIT_MESSAGE
+    public static final String SPLIT_MESSAGE = ",";
+    // HOST
+    public static final String HOST = "localhost";
+
     // KAFKA_PROPERTIES
     static {
         KAFKA_PROPERTIES.put("bootstrap.servers", "localhost:9092");
