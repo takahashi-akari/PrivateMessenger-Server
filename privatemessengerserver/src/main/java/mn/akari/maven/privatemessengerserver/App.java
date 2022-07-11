@@ -115,41 +115,39 @@ public class App {
 
     private static void connectToSocket() {
         try {
-            SOCKET.connect(SOCKET_ADDRESS, Constants.TIMEOUT);
+            SOCKET.connect(SOCKET_ADDRESS);
         } catch (IOException e) {
             LOGGER.log(Level.SEVERE, "Failed to connect to socket.", e);
         }
 
-        if (SOCKET.isConnected()) {
-            LOGGER.info("Connected to socket.");
-        } else {
-            LOGGER.info("Failed to connect to socket.");
+        try {
+            SOCKET.setSoTimeout(Constants.TIMEOUT);
+        } catch (SocketException e) {
+            LOGGER.log(Level.SEVERE, "Failed to set socket timeout.", e);
         }
 
-        SOCKET_LIST.add(SOCKET);
-
-        if (SOCKET.isClosed()) {
-            LOGGER.info("Closed socket.");
-        } else {
-            LOGGER.info("Failed to close socket.");
+        try {
+            SOCKET.setKeepAlive(true);
+        } catch (SocketException e) {
+            LOGGER.log(Level.SEVERE, "Failed to set keep alive.", e);
         }
 
-        if (SOCKET.isBound()) {
-            LOGGER.info("Bound socket.");
-        } else {
-            LOGGER.info("Failed to bind socket.");
+        try {
+            SOCKET.setTcpNoDelay(true);
+        } catch (SocketException e) {
+            LOGGER.log(Level.SEVERE, "Failed to set tcp no delay.", e);
         }
 
-        if (SOCKET.isConnected()) {
-            LOGGER.info("Connected to socket.");
-        } else {
-            LOGGER.info("Failed to connect to socket.");
+        try {
+            SOCKET.setSoLinger(true, Constants.TIMEOUT);
+        } catch (SocketException e) {
+            LOGGER.log(Level.SEVERE, "Failed to set so linger.", e);
         }
 
-        if (SOCKET.isClosed()) {
-            LOGGER.info("Closed socket.");
-        } else {
-            LOGGER.info("Failed to close socket.");
+        try {
+            SOCKET.setReuseAddress(true);
+        } catch (SocketException e) {
+            LOGGER.log(Level.SEVERE, "Failed to set reuse address.", e);
         }
     }
 
