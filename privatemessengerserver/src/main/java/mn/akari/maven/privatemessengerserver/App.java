@@ -86,7 +86,7 @@ public class App {
 
     private static Socket getSocket() {
         try {
-            return new Socket(Constants.HOST_NAME, Constants.PORT);
+            return new Socket(Constants.HOST_NAME, Constants.SOCKET_PORT);
         } catch (IOException e) {
             LOGGER.log(Level.SEVERE, "Failed to get socket.", e);
             return null;
@@ -95,7 +95,7 @@ public class App {
 
     private static ServerSocket getServerSocket() {
         try {
-            return new ServerSocket(Constants.PORT);
+            return new ServerSocket(Constants.SERVER_SOCKET_OPEN_PORT);
         } catch (IOException e) {
             LOGGER.log(Level.SEVERE, "Failed to get socket.", e);
             return null;

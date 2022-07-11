@@ -21,8 +21,10 @@ import java.util.Collection;
 import java.util.Properties;
 
 public class Constants {
-    // PORT
-    public static final int PORT = 8888;
+    // SOCKET_PORT
+    public static final int SOCKET_PORT = 8888;
+    // SERVER_SOCKET_OPEN_PORT
+    public static final int SERVER_SOCKET_OPEN_PORT = 8889;
     // KAFKA_PROPERTIES
     public static final Properties KAFKA_PROPERTIES = new Properties();
     // TOPIC
