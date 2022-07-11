@@ -1,5 +1,5 @@
 // @title Private Messenger Server - App
-// @version 0.0.8
+// @version 0.0.9
 // @author Takahashi Akari <akaritakahashioss@gmail.com>
 // @date 2022-07-09
 // @description This is a private messenger server. App.java contains main method.
@@ -152,7 +152,6 @@ public class App {
                     String messageType = message.split(Constants.DELIMITER)[0];
                     // String is a class for string.
                     String messageBody = message.split(Constants.DELIMITER)[1];
-                    // String is a class for string.
                 });
                 // TimeUnit is a class for time unit.
                 TimeUnit.SECONDS.sleep(1);

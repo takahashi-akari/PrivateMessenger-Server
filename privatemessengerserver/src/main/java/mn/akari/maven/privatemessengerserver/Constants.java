@@ -1,5 +1,5 @@
 // @title Private Messenger Server - Constants
-// @version 0.0.8
+// @version 0.0.9
 // @author Takahashi Akari <akaritakahashioss@gmail.com>
 // @date 2022-07-09
 // @description This is a private messenger server. This class contains constants.
@@ -48,11 +48,16 @@ public class Constants {
     // KAFKA_PROPERTIES
     static {
         KAFKA_PROPERTIES.put("bootstrap.servers", "localhost:9092");
+        KAFKA_PROPERTIES.put("acks", "all");
+        KAFKA_PROPERTIES.put("retries", 0);
+        KAFKA_PROPERTIES.put("batch.size", 16384);
+        KAFKA_PROPERTIES.put("linger.ms", 1);
+        KAFKA_PROPERTIES.put("buffer.memory", 33554432);
+        KAFKA_PROPERTIES.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer");
+        KAFKA_PROPERTIES.put("value.serializer", "org.apache.kafka.common.serialization.StringSerializer");
         KAFKA_PROPERTIES.put("key.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
         KAFKA_PROPERTIES.put("value.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
         KAFKA_PROPERTIES.put("group.id", "group1");
-        KAFKA_PROPERTIES.put("auto.offset.reset", "latest");
-        KAFKA_PROPERTIES.put("enable.auto.commit", "false");
     }
     // TOPIC
     static {
