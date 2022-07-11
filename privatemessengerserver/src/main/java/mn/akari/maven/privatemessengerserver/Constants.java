@@ -44,7 +44,7 @@ public class Constants {
     // HOST_NAME
     public static final String HOST_NAME = "127.0.0.1";
     // HOST
-    public static final SocketAddress HOST = new java.net.InetSocketAddress(HOST_NAME, PORT);
+    public static final SocketAddress HOST = new java.net.InetSocketAddress(HOST_NAME, SOCKET_PORT);
 
     // KAFKA_PROPERTIES
     static {
