@@ -66,7 +66,7 @@ public class App {
     // Socket is a class for socket.
     private static final Socket SOCKET = getSocket();
     // SocketAddress
-    private static final SocketAddress SOCKET_ADDRESS = SOCKET.getRemoteSocketAddress();
+    private static final SocketAddress SOCKET_ADDRESS = Constants.HOST;
 
     // Main method is a main method of this project.
     public static void main(String[] args) {
