@@ -69,7 +69,7 @@ public class App {
     // Socket is a class for socket.
     private static final Socket SOCKET = getSocket();
     // SocketAddress
-    private static final SocketAddress SOCKET_ADDRESS = getSocketAddress();
+    private static final SocketAddress SOCKET_ADDRESS = SOCKET.getRemoteSocketAddress();
 
     // Main method is a main method of this project.
     public static void main(String[] args) {
@@ -82,15 +82,6 @@ public class App {
         // shutdown
         LOGGER.info("Shutdown...");
         shutdown();
-    }
-
-    private static SocketAddress getSocketAddress() {
-        return new SocketAddress() {
-            @Override
-            public String toString() {
-                return "";
-            }
-        };
     }
 
     private static Socket getSocket() {

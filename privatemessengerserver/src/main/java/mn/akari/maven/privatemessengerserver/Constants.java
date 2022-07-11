@@ -22,7 +22,7 @@ import java.util.Properties;
 
 public class Constants {
     // PORT
-    public static final int PORT = 8083;
+    public static final int PORT = 8888;
     // KAFKA_PROPERTIES
     public static final Properties KAFKA_PROPERTIES = new Properties();
     // TOPIC
@@ -40,13 +40,13 @@ public class Constants {
         add(TOPIC);
     }};
     // HOST_NAME
-    public static final String HOST_NAME = "localhost";
+    public static final String HOST_NAME = "127.0.0.1";
     // HOST
     public static final SocketAddress HOST = new java.net.InetSocketAddress(HOST_NAME, PORT);
 
     // KAFKA_PROPERTIES
     static {
-        KAFKA_PROPERTIES.put("bootstrap.servers", "localhost:9092");
+        KAFKA_PROPERTIES.put("bootstrap.servers", "127.0.0.1:9092");
         KAFKA_PROPERTIES.put("acks", "all");
         KAFKA_PROPERTIES.put("retries", 0);
         KAFKA_PROPERTIES.put("batch.size", 16384);
