@@ -114,7 +114,7 @@ public class App {
 
     private static void connectToSocket() {
         try {
-            SOCKET.connect(SOCKET_ADDRESS);
+            SOCKET.connect(SOCKET_ADDRESS, Constants.TIMEOUT);
         } catch (IOException e) {
             LOGGER.log(Level.SEVERE, "Failed to connect to socket.", e);
         }

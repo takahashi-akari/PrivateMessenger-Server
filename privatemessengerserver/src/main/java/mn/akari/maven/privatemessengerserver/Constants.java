@@ -34,7 +34,7 @@ public class Constants {
     // SPLIT_MESSAGE
     public static final String SPLIT_MESSAGE = ",";
     // TIMEOUT
-    public static int TIMEOUT = 1000;
+    public static int TIMEOUT = 5000;
     // TOPICS
     public static final Collection<String> TOPICS = new ArrayList<String>() {{
         add(TOPIC);
