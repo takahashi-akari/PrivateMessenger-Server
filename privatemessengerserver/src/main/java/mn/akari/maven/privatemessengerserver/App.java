@@ -85,7 +85,7 @@ public class App {
         return new SocketAddress() {
             @Override
             public String toString() {
-                return "127.0.0.1";
+                return Constants.HOST_NAME + ":" + Constants.SOCKET_PORT;
             }
         };
     }
