@@ -1,5 +1,5 @@
 // @title Private Messenger Server - App
-// @version 0.0.13
+// @version 0.0.14
 // @author Takahashi Akari <akaritakahashioss@gmail.com>
 // @date 2022-07-09
 // @description This is a private messenger server. App.java contains main method.
@@ -15,7 +15,6 @@
 package mn.akari.maven.privatemessengerserver;
 
 import java.io.IOException;
-import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketAddress;
 import java.net.SocketException;
@@ -54,8 +53,6 @@ public class App {
     private static final Logger LOGGER = Logger.getLogger(App.class.getName());
     // ExecutorService is a class for thread pool.
     private static final ExecutorService EXECUTOR_SERVICE = Executors.newCachedThreadPool();
-    // ServerSocket is a class for server socket.
-    private static final ServerSocket SERVER_SOCKET = getServerSocket();
     // List is a class for list.
     private static final List<Socket> SOCKET_LIST = new ArrayList<>();
     // KafkaConsumer is a class for kafka consumer.
@@ -87,15 +84,6 @@ public class App {
     private static Socket getSocket() {
         try {
             return new Socket(Constants.HOST_NAME, Constants.SOCKET_PORT);
-        } catch (IOException e) {
-            LOGGER.log(Level.SEVERE, "Failed to get socket.", e);
-            return null;
-        }
-    }
-
-    private static ServerSocket getServerSocket() {
-        try {
-            return new ServerSocket(Constants.SERVER_SOCKET_OPEN_PORT);
         } catch (IOException e) {
             LOGGER.log(Level.SEVERE, "Failed to get socket.", e);
             return null;
@@ -162,9 +150,6 @@ public class App {
 
     // start method is a method for starting.
     private static void start() {
-        // start server socket
-        LOGGER.info("Starting server socket...");
-        startServerSocket();
         // start kafka consumer
         LOGGER.info("Starting kafka consumer...");
         startKafkaConsumer();
@@ -263,36 +248,8 @@ public class App {
         }
     }
 
-    private static void startServerSocket() {
-        try {
-            SERVER_SOCKET.setSoTimeout(Constants.TIMEOUT);
-        } catch (SocketException e) {
-            LOGGER.log(Level.SEVERE, "Failed to set socket timeout.", e);
-        }
-        while (true) {
-            try {
-                // get socket
-                Socket socket = SERVER_SOCKET.accept();
-                // add socket
-                SOCKET_LIST.add(socket);
-                // get message
-                // socket to string
-                String message = socket.toString();
-                // send message
-                sendMessage(message);
-            } catch (SocketTimeoutException e) {
-                LOGGER.log(Level.SEVERE, "Failed to get socket.", e);
-            } catch (IOException e) {
-                LOGGER.log(Level.SEVERE, "Failed to get socket.", e);
-            }
-        }
-    }
-
     // shutdown method is a method for shutting down.
     private static void shutdown() {
-        // shutdown server socket
-        LOGGER.info("Shutting down server socket...");
-        shutdownServerSocket();
         // shutdown kafka consumer
         LOGGER.info("Shutting down kafka consumer...");
         shutdownKafkaConsumer();
@@ -337,14 +294,6 @@ public class App {
             KAFKA_CONSUMER.close();
         } catch (Exception e) {
             LOGGER.log(Level.SEVERE, "Failed to close kafka consumer.", e);
-        }
-    }
-
-    private static void shutdownServerSocket() {
-        try {
-            SERVER_SOCKET.close();
-        } catch (IOException e) {
-            LOGGER.log(Level.SEVERE, "Failed to close server socket.", e);
         }
     }
 }

@@ -1,5 +1,5 @@
 // @title Private Messenger Server - Constants
-// @version 0.0.13
+// @version 0.0.14
 // @author Takahashi Akari <akaritakahashioss@gmail.com>
 // @date 2022-07-09
 // @description This is a private messenger server. This class contains constants.
@@ -23,8 +23,6 @@ import java.util.Properties;
 public class Constants {
     // SOCKET_PORT
     public static final int SOCKET_PORT = 8888;
-    // SERVER_SOCKET_OPEN_PORT
-    public static final int SERVER_SOCKET_OPEN_PORT = 8889;
     // KAFKA_PROPERTIES
     public static final Properties KAFKA_PROPERTIES = new Properties();
     // TOPIC
