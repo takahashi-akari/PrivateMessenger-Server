@@ -95,7 +95,7 @@ public class App {
 
     private static Socket getSocket() {
         try {
-            return new Socket(Constants.HOST, Constants.PORT);
+            return new Socket(SOCKET_ADDRESS.toString(), Constants.PORT);
         } catch (IOException e) {
             LOGGER.log(Level.SEVERE, "Failed to get socket.", e);
             return null;
