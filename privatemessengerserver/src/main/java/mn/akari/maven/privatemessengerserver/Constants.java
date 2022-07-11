@@ -1,5 +1,5 @@
 // @title Private Messenger Server - Constants
-// @version 0.0.12
+// @version 0.0.13
 // @author Takahashi Akari <akaritakahashioss@gmail.com>
 // @date 2022-07-09
 // @description This is a private messenger server. This class contains constants.
@@ -15,35 +15,28 @@
     
 package mn.akari.maven.privatemessengerserver;
 
+import java.net.SocketAddress;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Properties;
 
 public class Constants {
     // PORT
-    public static final int PORT = 8080;
+    public static final int PORT = 8083;
     // KAFKA_PROPERTIES
     public static final Properties KAFKA_PROPERTIES = new Properties();
     // TOPIC
-    public static final Collection<String> TOPIC = new ArrayList<>();
+    public static final String TOPIC = "topic1";
     // MESSAGE
     public static final String MESSAGE = "message";
-    // MESSAGE_TYPE
-    public static final String MESSAGE_TYPE = "messageType";
-    // MESSAGE_TYPE_REQUEST
-    public static final String MESSAGE_TYPE_REQUEST = "request";
-    // MESSAGE_TYPE_RESPONSE
-    public static final String MESSAGE_TYPE_RESPONSE = "response";
-    // MESSAGE_TYPE_NOTIFICATION
-    public static final String MESSAGE_TYPE_NOTIFICATION = "notification";
-    // MESSAGE_TYPE_ERROR
-    public static final String MESSAGE_TYPE_ERROR = "error";
     // DELIMITER
     public static final String DELIMITER = ":";
     // SPLIT_MESSAGE
     public static final String SPLIT_MESSAGE = ",";
     // HOST
     public static final String HOST = "localhost";
+    // TIMEOUT
+    public static int TIMEOUT = 1000;
 
     // KAFKA_PROPERTIES
     static {
@@ -58,11 +51,5 @@ public class Constants {
         KAFKA_PROPERTIES.put("key.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
         KAFKA_PROPERTIES.put("value.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
         KAFKA_PROPERTIES.put("group.id", "group1");
-    }
-    // TOPIC
-    static {
-        TOPIC.add("topic1");
-        TOPIC.add("topic2");
-        TOPIC.add("topic3");
     }
 }

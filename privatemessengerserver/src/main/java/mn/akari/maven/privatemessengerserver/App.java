@@ -1,5 +1,5 @@
 // @title Private Messenger Server - App
-// @version 0.0.12
+// @version 0.0.13
 // @author Takahashi Akari <akaritakahashioss@gmail.com>
 // @date 2022-07-09
 // @description This is a private messenger server. App.java contains main method.
@@ -17,6 +17,8 @@ package mn.akari.maven.privatemessengerserver;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.SocketException;
+import java.net.SocketTimeoutException;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
@@ -36,6 +38,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.util.Collection;
 
+import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.clients.producer.KafkaProducer;
@@ -59,19 +62,9 @@ public class App {
     // KafkaProducer is a class for kafka producer.
     private static final KafkaProducer<String, String> KAFKA_PRODUCER = new KafkaProducer<>(Constants.KAFKA_PROPERTIES);
     // String is a class for string.
-    private static final Collection<String> TOPIC = Constants.TOPIC;
+    private static final String TOPIC = Constants.TOPIC;
     // String is a class for string.
     private static final String MESSAGE = Constants.MESSAGE;
-    // String is a class for string.
-    private static final String MESSAGE_TYPE = Constants.MESSAGE_TYPE;
-    // String is a class for string.
-    private static final String MESSAGE_TYPE_REQUEST = Constants.MESSAGE_TYPE_REQUEST;
-    // String is a class for string.
-    private static final String MESSAGE_TYPE_RESPONSE = Constants.MESSAGE_TYPE_RESPONSE;
-    // String is a class for string.
-    private static final String MESSAGE_TYPE_NOTIFICATION = Constants.MESSAGE_TYPE_NOTIFICATION;
-    // String is a class for string.
-    private static final String MESSAGE_TYPE_ERROR = Constants.MESSAGE_TYPE_ERROR;
     // Socket is a class for socket.
     private static final Socket SOCKET = getSocket();
 
@@ -108,98 +101,247 @@ public class App {
 
     // initialize method is a method for initializing.
     private static void initialize() {
-        // KafkaConsumer is a class for kafka consumer.
-        KAFKA_CONSUMER.subscribe(TOPIC);
-        // KafkaProducer is a class for kafka producer.
-        ProducerRecord<String, String> producerRecord = new ProducerRecord<>(TOPIC.iterator().next(), MESSAGE);
-        KAFKA_PRODUCER.send(producerRecord);
+        // connect to kafka
+        LOGGER.info("Connecting to kafka...");
+        connectToKafka();
+        // connect to socket
+        LOGGER.info("Connecting to socket...");
+        connectToSocket();
+    }
 
-        // ExecutorService is a class for thread pool.
+    private static void connectToSocket() {
+        try {
+            SOCKET.connect(Constants.HOST, Constants.PORT);
+        } catch (IOException e) {
+            LOGGER.log(Level.SEVERE, "Failed to connect to socket.", e);
+        }
+
+        if (SOCKET.isConnected()) {
+            LOGGER.info("Connected to socket.");
+        } else {
+            LOGGER.info("Failed to connect to socket.");
+        }
+
+        SOCKET_LIST.add(SOCKET);
+
+        if (SOCKET.isClosed()) {
+            LOGGER.info("Closed socket.");
+        } else {
+            LOGGER.info("Failed to close socket.");
+        }
+
+        if (SOCKET.isBound()) {
+            LOGGER.info("Bound socket.");
+        } else {
+            LOGGER.info("Failed to bind socket.");
+        }
+
+        if (SOCKET.isConnected()) {
+            LOGGER.info("Connected to socket.");
+        } else {
+            LOGGER.info("Failed to connect to socket.");
+        }
+
+        if (SOCKET.isClosed()) {
+            LOGGER.info("Closed socket.");
+        } else {
+            LOGGER.info("Failed to close socket.");
+        }
+    }
+
+    private static void connectToKafka() {
+        try {
+            KAFKA_CONSUMER.subscribe(TOPIC);
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, "Failed to connect to kafka.", e);
+        }
+    }
+
+    // start method is a method for starting.
+    private static void start() {
+        // start server socket
+        LOGGER.info("Starting server socket...");
+        startServerSocket();
+        // start kafka consumer
+        LOGGER.info("Starting kafka consumer...");
+        startKafkaConsumer();
+        // start kafka producer
+        LOGGER.info("Starting kafka producer...");
+        startKafkaProducer();
+        // start socket
+        LOGGER.info("Starting socket...");
+        startSocket();
+        // start executor service
+        LOGGER.info("Starting executor service...");
+        startExecutorService();
+    }
+    private static void startExecutorService() {
         EXECUTOR_SERVICE.execute(() -> {
-            // while loop
             while (true) {
-                // try catch
                 try {
-                    // Socket is a class for socket.
-                    Socket socket = SERVER_SOCKET.accept();
-                    // Socket is a class for socket.
-                    SOCKET_LIST.add(socket);
-                    // Client is a class for client.
-                    Client client = new Client(socket);
-                    // ExecutorService is a class for thread pool.
-                    EXECUTOR_SERVICE.execute((Runnable) client);
-                } catch (IOException e) {
-                    // Logger is a class for logging.
-                    LOGGER.log(Level.SEVERE, e.getMessage(), e);
+                    // get records
+                    ConsumerRecords<String, String> records = KAFKA_CONSUMER.poll(Duration.ofMillis(1000));
+                    // get record
+                    for (ConsumerRecord<String, String> record : records) {
+                        // get message
+                        String message = record.value();
+                        // send message
+                        sendMessage(message);
+                    }
+                } catch (Exception e) {
+                    LOGGER.log(Level.SEVERE, "Failed to get records.", e);
                 }
             }
         });
     }
 
-    // start method is a method for starting.
-    private static void start() {
-        // while loop
+    private static void sendMessage(String message2) {
+        try {
+            ProducerRecord<String, String> record = new ProducerRecord<>(Constants.TOPIC, message2);
+            KAFKA_PRODUCER.send(record);
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, "Failed to send message.", e);
+        }
+    }
+
+    private static void startSocket() {
+        try {
+            SOCKET.setSoTimeout(Constants.TIMEOUT);
+        } catch (SocketException e) {
+            LOGGER.log(Level.SEVERE, "Failed to set socket timeout.", e);
+        }
         while (true) {
-            // try catch
             try {
-                // ConsumerRecords is a class for consumer records.
-                ConsumerRecords<String, String> consumerRecords = KAFKA_CONSUMER.poll(Duration.ofMillis(100));
-                // ConsumerRecords is a class for consumer records.
-                consumerRecords.forEach(record -> {
-                    // String is a class for string.
-                    String message = record.value();
-                    // String is a class for string.
-                    String messageType = message.split(Constants.DELIMITER)[0];
-                    // String is a class for string.
-                    String messageBody = message.split(Constants.DELIMITER)[1];
-                });
-                // TimeUnit is a class for time unit.
-                TimeUnit.SECONDS.sleep(1);
-
-                // ProducerRecord is a class for producer record.
-                ProducerRecord<String, String> producerRecord = new ProducerRecord<>(TOPIC.iterator().next(), MESSAGE);
-                // KafkaProducer is a class for kafka producer.
-                KAFKA_PRODUCER.send(producerRecord);
-
-                // TimeUnit is a class for time unit.
-                TimeUnit.SECONDS.sleep(1);
-            } catch (Exception e) {
-                // Logger is a class for logging.
-                LOGGER.log(Level.SEVERE, e.getMessage(), e);
+                // get message
+                String message = ((DataInputStream) SOCKET.getInputStream()).readUTF();
+                // send message
+                sendMessage(message);
+            } catch (SocketTimeoutException e) {
+                LOGGER.log(Level.SEVERE, "Failed to get message.", e);
+            } catch (IOException e) {
+                LOGGER.log(Level.SEVERE, "Failed to get message.", e);
             }
         }
     }
+
+    private static void startKafkaProducer() {
+        try {
+            KAFKA_PRODUCER.initTransactions();
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, "Failed to init transactions.", e);
+        }
+        while (true) {
+            try {
+                // get message
+                String message = MESSAGE;
+                // send message
+                sendMessage(message);
+            } catch (Exception e) {
+                LOGGER.log(Level.SEVERE, "Failed to send message.", e);
+            }
+        }
+    }
+
+    private static void startKafkaConsumer() {
+        while (true) {
+            try {
+                // get records
+                ConsumerRecords<String, String> records = KAFKA_CONSUMER.poll(Duration.ofMillis(1000));
+                // get record
+                for (ConsumerRecord<String, String> record : records) {
+                    // get message
+                    String message = record.value();
+                    // send message
+                    sendMessage(message);
+                }
+            } catch (Exception e) {
+                LOGGER.log(Level.SEVERE, "Failed to get records.", e);
+            }
+        }
+    }
+
+    private static void startServerSocket() {
+        try {
+            SERVER_SOCKET.setSoTimeout(Constants.TIMEOUT);
+        } catch (SocketException e) {
+            LOGGER.log(Level.SEVERE, "Failed to set socket timeout.", e);
+        }
+        while (true) {
+            try {
+                // get socket
+                Socket socket = SERVER_SOCKET.accept();
+                // add socket
+                SOCKET_LIST.add(socket);
+                // get message
+                String message = ((DataInputStream) socket.getInputStream()).readUTF();
+                // send message
+                sendMessage(message);
+            } catch (SocketTimeoutException e) {
+                LOGGER.log(Level.SEVERE, "Failed to get socket.", e);
+            } catch (IOException e) {
+                LOGGER.log(Level.SEVERE, "Failed to get socket.", e);
+            }
+        }
+    }
+
     // shutdown method is a method for shutting down.
     private static void shutdown() {
-        // try catch block
+        // shutdown server socket
+        LOGGER.info("Shutting down server socket...");
+        shutdownServerSocket();
+        // shutdown kafka consumer
+        LOGGER.info("Shutting down kafka consumer...");
+        shutdownKafkaConsumer();
+        // shutdown kafka producer
+        LOGGER.info("Shutting down kafka producer...");
+        shutdownKafkaProducer();
+        // shutdown socket
+        LOGGER.info("Shutting down socket...");
+        shutdownSocket();
+        // shutdown executor service
+        LOGGER.info("Shutting down executor service...");
+        shutdownExecutorService();
+    }
+
+    private static void shutdownExecutorService() {
+        EXECUTOR_SERVICE.shutdown();
         try {
-            // KafkaConsumer is a class for kafka consumer.
-            KAFKA_CONSUMER.close();
-            // KafkaProducer is a class for kafka producer.
-            KAFKA_PRODUCER.close();
-            // ServerSocket is a class for server socket.
-            SERVER_SOCKET.close();
-            // ExecutorService is a class for thread pool.
-            EXECUTOR_SERVICE.shutdown();
-            // ExecutorService is a class for thread pool.
-            EXECUTOR_SERVICE.awaitTermination(1, TimeUnit.MINUTES);
-            // List is a class for list.
-            for (Socket socket : SOCKET_LIST) {
-                // Socket is a class for socket.
-                socket.close();
-            }
-            // close method is a method for closing.
-            SOCKET.close();
-        } catch (IOException | InterruptedException e) {
-            // Logger is a class for logging.
-            LOGGER.log(Level.SEVERE, e.getMessage(), e);
+            EXECUTOR_SERVICE.awaitTermination(Constants.TIMEOUT, TimeUnit.MILLISECONDS);
+        } catch (InterruptedException e) {
+            LOGGER.log(Level.SEVERE, "Failed to await termination.", e);
         }
+    }
 
-        // Logger is a class for logging.
-        LOGGER.info("Shutdown complete.");
+    private static void shutdownSocket() {
+        try {
+            SOCKET.close();
+        } catch (IOException e) {
+            LOGGER.log(Level.SEVERE, "Failed to close socket.", e);
+        }
+    }
 
-        // System is a class for system.
-        System.exit(0);
+    private static void shutdownKafkaProducer() {
+        try {
+            KAFKA_PRODUCER.close();
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, "Failed to close kafka producer.", e);
+        }
+    }
+
+    private static void shutdownKafkaConsumer() {
+        try {
+            KAFKA_CONSUMER.close();
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, "Failed to close kafka consumer.", e);
+        }
+    }
+
+    private static void shutdownServerSocket() {
+        try {
+            SERVER_SOCKET.close();
+        } catch (IOException e) {
+            LOGGER.log(Level.SEVERE, "Failed to close server socket.", e);
+        }
     }
 }
 // Client is a class for client.
@@ -214,19 +356,6 @@ class Client implements Runnable {
     private BufferedWriter bufferedWriter ;
     // String is a class for string.
     private String message;
-    // String is a class for string.
-    private String messageType;
-    // String is a class for string.
-    private String messageBody;
-    // String is a class for string.
-    private String messageResponse;
-    // String is a class for string.
-    private String messageError;
-    // String is a class for string.
-    private String messageNotification;
-    // String is a class for string.
-    private String messageRequest;
-    // String is a class for string.
 
     // constructor
     public Client(Socket socket) {
@@ -234,20 +363,8 @@ class Client implements Runnable {
         this.socket = socket;
         // String is a class for string.
         this.message = null;
-        // String is a class for string.
-        this.messageType = null;
-        // String is a class for string.
-        this.messageBody = null;
-        // String is a class for string.
-        this.messageResponse = null;
-        // String is a class for string.
-        this.messageError = null;
-        // String is a class for string.
-        this.messageNotification = null;
-        // String is a class for string.
-        this.messageRequest = null;
 
-        // try catch block
+        // BufferedReader is a class for buffered reader.
         try {
             // BufferedReader is a class for buffered reader.
             this.bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
@@ -257,179 +374,25 @@ class Client implements Runnable {
             // Logger is a class for logging.
             LOGGER.log(Level.SEVERE, e.getMessage(), e);
         }
-
-        // Logger is a class for logging.
-        LOGGER.info("Client connected.");
-
-        // try catch block
-        try {
-            // String is a class for string.
-            this.message = this.bufferedReader.readLine();
-            // String is a class for string.
-            this.messageType = this.message.substring(0, this.message.indexOf(":"));
-            // String is a class for string.
-            this.messageBody = this.message.substring(this.message.indexOf(":") + 1);
-        } catch (IOException e) {
-            // Logger is a class for logging.
-            LOGGER.log(Level.SEVERE, e.getMessage(), e);
-        }
-
-        // Logger is a class for logging.
-        LOGGER.info("Client message received.");
-
-        // try catch block
-        try {
-            // String is a class for string.
-            this.messageResponse = this.messageType + ":response";
-            // String is a class for string.
-            this.messageError = this.messageType + ":error";
-            // String is a class for string.
-            this.messageNotification = this.messageType + ":notification";
-            // String is a class for string.
-            this.messageRequest = this.messageType + ":request";
-        } catch (Exception e) {
-            // Logger is a class for logging.
-            LOGGER.log(Level.SEVERE, e.getMessage(), e);
-        }
-
-        // Logger is a class for logging.
-        LOGGER.info("Client message types received.");
-    }
-    
-    // getMessage is a method for get message.
-    public String getMessage() {
-        // String is a class for string.
-        return this.message;
     }
 
-    // getMessageType is a method for get message type.
-    public String getMessageType() {
-        // String is a class for string.
-        return this.messageType;
-    }
-
-    // getMessageBody is a method for get message body.
-    public String getMessageBody() {
-        // String is a class for string.
-        return this.messageBody;
-    }
-
-    // getMessageResponse is a method for get message response.
-    public String getMessageResponse() {
-        // String is a class for string.
-        return this.messageResponse;
-    }
-
-    // getMessageError is a method for get message error.
-    public String getMessageError() {
-        // String is a class for string.
-        return this.messageError;
-    }
-
-    // getMessageNotification is a method for get message notification.
-    public String getMessageNotification() {
-        // String is a class for string.
-        return this.messageNotification;
-    }
-
-    // getMessageRequest is a method for get message request.
-    public String getMessageRequest() {
-        // String is a class for string.
-        return this.messageRequest;
-    }
-
-    // setMessage is a method for set message.
-    public void setMessage(String message) {
-        // String is a class for string.
-        this.message = message;
-    }
-
-    // setMessageType is a method for set message type.
-    public void setMessageType(String messageType) {
-        // String is a class for string.
-        this.messageType = messageType;
-    }
-
-    // setMessageBody is a method for set message body.
-    public void setMessageBody(String messageBody) {
-        // String is a class for string.
-        this.messageBody = messageBody;
-    }
-
-    // setMessageResponse is a method for set message response.
-    public void setMessageResponse(String messageResponse) {
-        // String is a class for string.
-        this.messageResponse = messageResponse;
-    }
-
-    // setMessageError is a method for set message error.
-    public void setMessageError(String messageError) {
-        // String is a class for string.
-        this.messageError = messageError;
-    }
-
-    // setMessageNotification is a method for set message notification.
-    public void setMessageNotification(String messageNotification) {
-        // String is a class for string.
-        this.messageNotification = messageNotification;
-    }
-
-    // setMessageRequest is a method for set message request.
-    public void setMessageRequest(String messageRequest) {
-        // String is a class for string.
-        this.messageRequest = messageRequest;
-    }
-
-    // toString is a method for to string.
-    @Override
-    public String toString() {
-        // String is a class for string.
-        return "Message{" +
-                "message='" + message + '\'' +
-                ", messageType='" + messageType + '\'' +
-                ", messageBody='" + messageBody + '\'' +
-                ", messageResponse='" + messageResponse + '\'' +
-                ", messageError='" + messageError + '\'' +
-                ", messageNotification='" + messageNotification + '\'' +
-                ", messageRequest='" + messageRequest + '\'' +
-                '}';
-    }
-
+    // run method is a method for running.
     @Override
     public void run() {
-        // try catch block
-        try {
-            // BufferedWriter is a class for buffered writer.
-            this.bufferedWriter.write(this.message);
-            // BufferedWriter is a class for buffered writer.
-            this.bufferedWriter.newLine();
-            // BufferedWriter is a class for buffered writer.
-            this.bufferedWriter.flush();
-        } catch (IOException e) {
-            // Logger is a class for logging.
-            LOGGER.log(Level.SEVERE, e.getMessage(), e);
+        // while loop
+        while (true) {
+            // try catch
+            try {
+                // String is a class for string.
+                String message = bufferedReader.readLine();
+                // String is a class for string.
+                this.message = message;
+                // Logger is a class for logging.
+                LOGGER.info(message);
+            } catch (IOException e) {
+                // Logger is a class for logging.
+                LOGGER.log(Level.SEVERE, e.getMessage(), e);
+            }
         }
-
-        // Logger is a class for logging.
-        LOGGER.info("Client message sent.");
-    }
-
-    // close is a method for close.
-    public void close() {
-        // try catch block
-        try {
-            // BufferedReader is a class for buffered reader.
-            this.bufferedReader.close();
-            // BufferedWriter is a class for buffered writer.
-            this.bufferedWriter.close();
-            // Socket is a class for socket.
-            this.socket.close();
-        } catch (IOException e) {
-            // Logger is a class for logging.
-            LOGGER.log(Level.SEVERE, e.getMessage(), e);
-        }
-
-        // Logger is a class for logging.
-        LOGGER.info("Client closed.");
     }
 }
