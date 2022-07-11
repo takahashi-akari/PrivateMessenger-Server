@@ -285,7 +285,8 @@ public class App {
                 // add socket
                 SOCKET_LIST.add(socket);
                 // get message
-                String message = ((DataInputStream) socket.getInputStream()).readUTF();
+                // socket to string
+                String message = socket.toString();
                 // send message
                 sendMessage(message);
             } catch (SocketTimeoutException e) {
