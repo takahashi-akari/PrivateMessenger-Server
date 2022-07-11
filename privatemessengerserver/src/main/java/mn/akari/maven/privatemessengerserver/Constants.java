@@ -34,12 +34,7 @@ public class Constants {
     // SPLIT_MESSAGE
     public static final String SPLIT_MESSAGE = ",";
     // HOST
-    public static final SocketAddress HOST = new SocketAddress() {
-        @Override
-        public String toString() {
-            return "localhost";
-        }
-    };
+    public static final SocketAddress HOST;
     // TIMEOUT
     public static int TIMEOUT = 1000;
     // TOPICS
@@ -60,5 +55,14 @@ public class Constants {
         KAFKA_PROPERTIES.put("key.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
         KAFKA_PROPERTIES.put("value.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
         KAFKA_PROPERTIES.put("group.id", "group1");
+    }
+    // HOST
+    static {
+        HOST = new SocketAddress() {
+            @Override
+            public String toString() {
+                return "localhost";
+            }
+        };
     }
 }
