@@ -66,7 +66,7 @@ public class App {
     // Socket is a class for socket.
     private static final Socket SOCKET = getSocket();
     // SocketAddress
-    private static final SocketAddress SOCKET_ADDRESS = Constants.HOST;
+    private static final SocketAddress SOCKET_ADDRESS = getSocketAddress();
 
     // Main method is a main method of this project.
     public static void main(String[] args) {
@@ -79,6 +79,15 @@ public class App {
         // shutdown
         LOGGER.info("Shutdown...");
         shutdown();
+    }
+
+    private static SocketAddress getSocketAddress() {
+        return new SocketAddress() {
+            @Override
+            public String toString() {
+                return "127.0.0.1";
+            }
+        };
     }
 
     private static Socket getSocket() {
