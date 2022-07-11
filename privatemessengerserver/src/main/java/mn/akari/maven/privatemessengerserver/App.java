@@ -17,6 +17,7 @@ package mn.akari.maven.privatemessengerserver;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.SocketAddress;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.time.Duration;
@@ -67,6 +68,8 @@ public class App {
     private static final String MESSAGE = Constants.MESSAGE;
     // Socket is a class for socket.
     private static final Socket SOCKET = getSocket();
+    // SocketAddress
+    private static final SocketAddress SOCKET_ADDRESS = getSocketAddress();
 
     // Main method is a main method of this project.
     public static void main(String[] args) {
@@ -79,6 +82,15 @@ public class App {
         // shutdown
         LOGGER.info("Shutdown...");
         shutdown();
+    }
+
+    private static SocketAddress getSocketAddress() {
+        return new SocketAddress() {
+            @Override
+            public String toString() {
+                return "";
+            }
+        };
     }
 
     private static Socket getSocket() {
@@ -111,7 +123,7 @@ public class App {
 
     private static void connectToSocket() {
         try {
-            SOCKET.connect(Constants.HOST, Constants.PORT);
+            SOCKET.connect(SOCKET_ADDRESS);
         } catch (IOException e) {
             LOGGER.log(Level.SEVERE, "Failed to connect to socket.", e);
         }
@@ -151,7 +163,7 @@ public class App {
 
     private static void connectToKafka() {
         try {
-            KAFKA_CONSUMER.subscribe(TOPIC);
+            KAFKA_CONSUMER.subscribe(Constants.TOPICS);
         } catch (Exception e) {
             LOGGER.log(Level.SEVERE, "Failed to connect to kafka.", e);
         }

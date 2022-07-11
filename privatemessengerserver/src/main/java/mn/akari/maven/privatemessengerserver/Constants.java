@@ -34,9 +34,18 @@ public class Constants {
     // SPLIT_MESSAGE
     public static final String SPLIT_MESSAGE = ",";
     // HOST
-    public static final String HOST = "localhost";
+    public static final SocketAddress HOST = new SocketAddress() {
+        @Override
+        public String toString() {
+            return "localhost";
+        }
+    };
     // TIMEOUT
     public static int TIMEOUT = 1000;
+    // TOPICS
+    public static final Collection<String> TOPICS = new ArrayList<String>() {{
+        add(TOPIC);
+    }};
 
     // KAFKA_PROPERTIES
     static {
