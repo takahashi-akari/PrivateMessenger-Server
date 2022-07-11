@@ -1,5 +1,5 @@
 // @title Private Messenger Server - Constants
-// @version 0.0.14
+// @version 0.0.15
 // @author Takahashi Akari <akaritakahashioss@gmail.com>
 // @date 2022-07-09
 // @description This is a private messenger server. This class contains constants.
@@ -15,14 +15,13 @@
     
 package mn.akari.maven.privatemessengerserver;
 
-import java.net.SocketAddress;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Properties;
 
 public class Constants {
     // SOCKET_PORT
-    public static final int SOCKET_PORT = 8083;
+    public static final int SOCKET_PORT = 9092;
     // KAFKA_PROPERTIES
     public static final Properties KAFKA_PROPERTIES = new Properties();
     // TOPIC
