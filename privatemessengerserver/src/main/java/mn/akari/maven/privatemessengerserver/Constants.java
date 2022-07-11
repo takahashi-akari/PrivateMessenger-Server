@@ -33,14 +33,16 @@ public class Constants {
     public static final String DELIMITER = ":";
     // SPLIT_MESSAGE
     public static final String SPLIT_MESSAGE = ",";
-    // HOST
-    public static final SocketAddress HOST;
     // TIMEOUT
     public static int TIMEOUT = 1000;
     // TOPICS
     public static final Collection<String> TOPICS = new ArrayList<String>() {{
         add(TOPIC);
     }};
+    // HOST_NAME
+    public static final String HOST_NAME = "localhost";
+    // HOST
+    public static final SocketAddress HOST = new java.net.InetSocketAddress(HOST_NAME, PORT);
 
     // KAFKA_PROPERTIES
     static {
@@ -55,14 +57,5 @@ public class Constants {
         KAFKA_PROPERTIES.put("key.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
         KAFKA_PROPERTIES.put("value.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
         KAFKA_PROPERTIES.put("group.id", "group1");
-    }
-    // HOST
-    static {
-        HOST = new SocketAddress() {
-            @Override
-            public String toString() {
-                return "localhost";
-            }
-        };
     }
 }
