@@ -64,9 +64,9 @@ public class App {
     // String is a class for string.
     private static final String MESSAGE = Constants.MESSAGE;
     // Socket is a class for socket.
-    private static final Socket SOCKET = getSocket();
+    private static Socket SOCKET;
     // SocketAddress
-    private static final SocketAddress SOCKET_ADDRESS = getSocketAddress();
+    private static SocketAddress SOCKET_ADDRESS;
 
     // Main method is a main method of this project.
     public static void main(String[] args) {
@@ -101,6 +101,10 @@ public class App {
 
     // initialize method is a method for initializing.
     private static void initialize() {
+        // socket
+        SOCKET = getSocket();
+        // socket address
+        SOCKET_ADDRESS = getSocketAddress();
         // connect to kafka
         LOGGER.info("Connecting to kafka...");
         connectToKafka();
