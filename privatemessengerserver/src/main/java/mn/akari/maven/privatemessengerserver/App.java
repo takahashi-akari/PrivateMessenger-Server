@@ -129,9 +129,18 @@ public class App {
     private static void initialize() {
         // initialize
         try {
+            Properties KAFKA_PROPERTIES = new Properties();
+            KAFKA_PROPERTIES.put("bootstrap.servers", "localhost:9092");
+            KAFKA_PROPERTIES.put("group.id", "group1");
+            KAFKA_PROPERTIES.put("enable.auto.commit", "true");
+            KAFKA_PROPERTIES.put("auto.commit.interval.ms", "1000");
+            KAFKA_PROPERTIES.put("session.timeout.ms", "30000");
+            KAFKA_PROPERTIES.put("key.deserializer","org.apache.kafka.common.serialization.StringDeserializer");  
+            KAFKA_PROPERTIES.put("value.deserializer","org.apache.kafka.common.serialization.StringDeserializer");
+            KAFKA_PROPERTIES.put("partition.assignment.strategy", "range");
             // initialize
-            kafkaConsumer = new KafkaConsumer<>(new Properties(Constants.KAFKA_CONSUMER_PROPERTIES));
-            kafkaProducer = new KafkaProducer<>(new Properties(Constants.KAFKA_PRODUCER_PROPERTIES));
+            kafkaConsumer = new KafkaConsumer<>(new Properties(KAFKA_PROPERTIES));
+            kafkaProducer = new KafkaProducer<>(new Properties(KAFKA_PROPERTIES));
             client = new Client();
         } catch (Exception e) {
             logger.log(Level.SEVERE, "Exception", e);
