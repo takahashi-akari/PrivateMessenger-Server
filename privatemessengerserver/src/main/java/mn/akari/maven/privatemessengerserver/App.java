@@ -14,20 +14,11 @@
 // @see ./Constants.java
 package mn.akari.maven.privatemessengerserver;
 
-import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.net.SocketAddress;
-import java.net.SocketException;
-import java.net.SocketTimeoutException;
 import java.time.Duration;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Properties;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -36,7 +27,6 @@ import java.io.BufferedWriter;
 
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
-import java.util.Collection;
 import java.util.Collections;
 
 import org.apache.kafka.clients.consumer.ConsumerRecord;
@@ -60,107 +50,157 @@ public class App {
 
     // Main method is a main method of this project.
     public static void main(String[] args) {
+        logger.info("Started");
         // initialize
         initialize();
 
-        // run
-        run();
+        // sleep loop
+        while (true) {
+            // sleep
+            try {
+                Thread.sleep(Duration.ofSeconds(1).toMillis());
+            } catch (InterruptedException e) {
+                // log
+                logger.severe(e.getMessage());
 
-        // sleep
-        sleep();
+                // shutdown
+                shutdown();
 
-        // shutdown
-        shutdown();
+                // exit
+                // log
+                logger.info("Exited");
+                System.exit(1);
+            }
+
+            // check
+            // log
+            check();
+
+        }
     }
     
     private static void shutdown() {
-        // shutdown kafka consumer
-        kafkaConsumer.close();
-        // shutdown kafka producer
-        kafkaProducer.close();
-        // shutdown executor service
+        // shutdown
+        // log
+        logger.info("Shutdown");
         executorService.shutdown();
-        // shutdown client
-        client.shutdown();
+        kafkaConsumer.close();
+        kafkaProducer.close();
+        client.close();
+        // log
+        logger.info("Shutdown complete");
     }
 
-    private static void sleep() {
-        try {
-            Thread.sleep(Duration.ofSeconds(10).toMillis());
-        } catch (InterruptedException e) {
-            logger.log(Level.SEVERE, "InterruptedException", e);
+    private static void check() {
+        // log
+        logger.info("Check");
+        // check kafka consumer
+        if (kafkaConsumer == null) {
+            // initialize kafka consumer
+            initializeKafkaConsumer();
         }
+        
+        // check kafka producer
+        if (kafkaProducer == null) {
+            // initialize kafka producer
+            initializeKafkaProducer();
+        }
+        
+        // check client
+        if (client == null) {
+            // initialize client
+            initializeClient();
+        }
+        // log
+        logger.info("Check complete");
     }
 
-    private static void run() {
-        // run
+    private static void runExecutorService() {
+        // log
+        logger.info("Run executor service");
+        // run executor service
         executorService.execute(() -> {
-            // run
+            // run kafka consumer
             runKafkaConsumer();
         });
+
         executorService.execute(() -> {
-            // run
+            // run kafka producer
             runKafkaProducer();
         });
-        executorService.execute(() -> {
-            // run
-            runClient();
-        });
-    }
 
-    private static void runClient() {
-        // run
-        client.run();
+        executorService.execute(() -> {
+            // run client
+            client.run();
+        });
+        // log
+        logger.info("Run executor service complete");
     }
 
     private static void runKafkaProducer() {
-        // run
-        try {
-            // run
-            kafkaProducer.send(new ProducerRecord<String, String>(Constants.KAFKA_TOPIC_NAME, "test"));
-        } catch (Exception e) {
-            logger.log(Level.SEVERE, "Exception", e);
-        }
+        // log
+        logger.info("Run kafka producer");
+        String key = Constants.KAFKA_PRODUCER_KEY;
+        String value = Constants.KAFKA_PRODUCER_VALUE;
+        // run kafka producer
+        kafkaProducer.send(new ProducerRecord<String, String>(Constants.KAFKA_TOPIC_NAME, key, value));
+        // log
+        logger.info("Run kafka producer complete");
     }
 
     private static void runKafkaConsumer() {
-        // run
-        try {
-            // run
-            kafkaConsumer.subscribe(Collections.singletonList(Constants.KAFKA_TOPIC_NAME));
-            while (true) {
-                // run
-                ConsumerRecords<String, String> records = kafkaConsumer.poll(Duration.ofSeconds(1));
-                for (ConsumerRecord<String, String> record : records) {
-                    // run
-                    logger.info(record.value());
-                }
-            }
-        } catch (Exception e) {
-            logger.log(Level.SEVERE, "Exception", e);
+        // log
+        logger.info("Run kafka consumer");
+        // run kafka consumer
+        Duration duration = Duration.ofSeconds(1);
+        ConsumerRecords<String, String> records = kafkaConsumer.poll(duration);
+        for (ConsumerRecord<String, String> record : records) {
+            logger.info(record.value());
         }
+        // log
+        logger.info("Run kafka consumer complete");
     }
 
     private static void initialize() {
-        // initialize
-        try {
-            Properties KAFKA_PROPERTIES = new Properties();
-            KAFKA_PROPERTIES.put("bootstrap.servers", "127.0.0.1:9092");
-            KAFKA_PROPERTIES.put("group.id", "group1");
-            KAFKA_PROPERTIES.put("enable.auto.commit", "true");
-            KAFKA_PROPERTIES.put("auto.commit.interval.ms", "1000");
-            KAFKA_PROPERTIES.put("session.timeout.ms", "30000");
-            KAFKA_PROPERTIES.put("key.serializer","org.apache.kafka.common.serialization.StringSerializer");  
-            KAFKA_PROPERTIES.put("value.serializer","org.apache.kafka.common.serialization.StringSerializer");
-            KAFKA_PROPERTIES.put("key.deserializer","org.apache.kafka.common.serialization.StringDeserializer");  
-            KAFKA_PROPERTIES.put("value.deserializer","org.apache.kafka.common.serialization.StringDeserializer");
-            // initialize
-            kafkaConsumer = new KafkaConsumer<>(KAFKA_PROPERTIES);
-            kafkaProducer = new KafkaProducer<>(KAFKA_PROPERTIES);
-            client = new Client();
-        } catch (Exception e) {
-            logger.log(Level.SEVERE, "Exception", e);
-        }
+        // log
+        logger.info("Initialize");
+        // initialize client
+        initializeClient();
+        // initialize kafka consumer
+        initializeKafkaConsumer();
+        // initialize kafka producer
+        initializeKafkaProducer();
+        // initialize executor service
+        runExecutorService();
+        // log
+        logger.info("Initialize complete");
+    }
+
+    private static void initializeKafkaConsumer() {
+        // log
+        logger.info("Initialize kafka consumer");
+        // create kafka consumer
+        kafkaConsumer = new KafkaConsumer<>(Constants.KAFKA_CONSUMER_PROPERTIES);
+        // subscribe
+        kafkaConsumer.subscribe(Collections.singletonList(Constants.KAFKA_TOPIC_NAME));
+        // log
+        logger.info("Initialize kafka consumer complete");
+    }
+    private static void initializeKafkaProducer() {
+        // log
+        logger.info("Initialize kafka producer");
+        // create kafka producer
+        kafkaProducer = new KafkaProducer<>(Constants.KAFKA_PRODUCER_PROPERTIES);
+        // log
+        logger.info("Initialize kafka producer complete");
+    }
+    private static void initializeClient() {
+        // log
+        logger.info("Initialize client");
+        // create client
+        client = new Client();
+        // log
+        logger.info("Initialize client complete");
     }
 }
 
@@ -176,143 +216,66 @@ class Client {
     private static BufferedReader reader;
     // BufferedWriter is a class for buffered writer.
     private static BufferedWriter writer;
+    // message is a string for message.
+    private static String message;
+    // response is a string for response.
+    private static String response;
 
-    // run method is a method for running this class.
-    public void run() {
-        // run
+    // constructor
+    public Client() {
         try {
-            try (// run
-                // create socket
-                ServerSocket serverSocket = new ServerSocket(Constants.SERVER_PORT)) {
-                // accept socket
-                socket = serverSocket.accept();
-            } catch (Exception e) {
-                logger.log(Level.SEVERE, "Exception", e);
-                throw e;
-            }
+            // create server socket
+            serverSocket = new ServerSocket(Constants.PORT);
+            // create socket
+            socket = serverSocket.accept();
             // create reader
             reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             // create writer
             writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
-            // loop
-            while (true) {
-                // read message
-                String message = readMessage();
-                // send message
-                send(message);
-            }
         } catch (Exception e) {
-            // error
-            logger.log(Level.SEVERE, e.getMessage(), e);
-
-            // server socket close
-            if (serverSocket != null) {
-                try {
-                    serverSocket.close();
-                } catch (Exception e2) {
-                    logger.log(Level.SEVERE, e2.getMessage(), e2);
-                }
-            }
+            // log
+            logger.severe(e.getMessage());
         }
     }
-
-    public void message(String message) {
-        // message
+    public void close() {
         try {
-            // message
-            writer.write(message);
-            // message
-            writer.newLine();
-            // message
-            writer.flush();
-        } catch (IOException e) {
-            // error
-            logger.log(Level.SEVERE, e.getMessage(), e);
-        }
-
-        // log
-        logger.log(Level.INFO, "client: {0}", message);
-    }
-
-    public void sendMessage(String value) {
-        // run
-        try {
-            // run
-            // send message
-            writer.write(value);
-            // flush
-            writer.flush();
-        } catch (Exception e) {
-            // error
-            logger.log(Level.SEVERE, e.getMessage(), e);
-        }
-
-        // log
-        logger.log(Level.INFO, "client: send message: " + value);
-    }
-
-    public String getMessage() {
-        // run
-        try {
-            // run
-            return reader.readLine();
-        } catch (IOException e) {
-            // error
-            logger.log(Level.SEVERE, e.getMessage(), e);
-            // run
-            return null;
-        }
-    }
-
-    public void send(String message) {
-        // run
-        try {
-            // run
-            // send message
-            writer.write(message);
-            // flush
-            writer.flush();
-        } catch (Exception e) {
-            // error
-            logger.log(Level.SEVERE, e.getMessage(), e);
-        }
-
-        // log
-        logger.log(Level.INFO, "client: sent message: " + message);
-    }
-
-    private static String readMessage() {
-        // run
-        try {
-            // run
-            // read message
-            return reader.readLine();
-        } catch (IOException e) {
-            // error
-            logger.log(Level.SEVERE, e.getMessage(), e);
-            // run
-            return null;
-        }
-    }
-
-    void shutdown() {
-        // run
-        try {
-            // run
             // close socket
             socket.close();
-        } catch (IOException e) {
-            // error
-            logger.log(Level.SEVERE, e.getMessage(), e);
-        }
-        // serversocket close
-        try {
-            // run
+            // close server socket
             serverSocket.close();
-        } catch (IOException e) {
-            // error
-            logger.log(Level.SEVERE, e.getMessage(), e);
+        } catch (Exception e) {
+            // log
+            logger.severe(e.getMessage());
         }
     }
-}
+    // run method is a method for running this class.
+    public void run() {
+        // loop
+        while (true) {
+            // sleep
+            try {
+                Thread.sleep(Duration.ofSeconds(1).toMillis());
 
+                // receive message
+                message = reader.readLine();
+
+                // send response
+                response = message;
+                writer.write(response);
+                writer.newLine();
+                writer.flush();
+            } catch (Exception e) {
+                // log
+                logger.severe(e.getMessage());
+            }
+        }
+    }
+    // getMessage method is a method for getting message.
+    public String getMessage() {
+        return message;
+    }
+    // getResponse method is a method for getting response.
+    public String getResponse() {
+        return response;
+    }
+}
