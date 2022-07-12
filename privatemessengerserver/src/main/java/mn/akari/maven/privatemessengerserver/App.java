@@ -1,5 +1,5 @@
 // @title Private Messenger Server - App
-// @version 0.0.15
+// @version 0.0.16
 // @author Takahashi Akari <akaritakahashioss@gmail.com>
 // @date 2022-07-09
 // @description This is a private messenger server. App.java contains main method.
@@ -32,8 +32,6 @@ import java.io.BufferedWriter;
 
 // class App
 
-import java.io.DataInputStream;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.util.Collection;
@@ -44,319 +42,212 @@ import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 
-import mn.akari.maven.privatemessengerserver.Constants;
-import mn.akari.maven.privatemessengerserver.Client;
-
 // App class is a main class of this project.
 public class App {
     // Logger is a class for logging.
-    private static final Logger LOGGER = Logger.getLogger(App.class.getName());
+    private static Logger logger = Logger.getLogger(App.class.getName());
     // ExecutorService is a class for thread pool.
-    private static final ExecutorService EXECUTOR_SERVICE = Executors.newCachedThreadPool();
-    // List is a class for list.
-    private static final List<Socket> SOCKET_LIST = new ArrayList<>();
+    private static ExecutorService executorService = Executors.newCachedThreadPool();
     // KafkaConsumer is a class for kafka consumer.
-    private static final KafkaConsumer<String, String> KAFKA_CONSUMER = new KafkaConsumer<>(Constants.KAFKA_PROPERTIES);
+    private static KafkaConsumer<String, String> kafkaConsumer;
     // KafkaProducer is a class for kafka producer.
-    private static final KafkaProducer<String, String> KAFKA_PRODUCER = new KafkaProducer<>(Constants.KAFKA_PROPERTIES);
-    // String is a class for string.
-    private static final String TOPIC = Constants.TOPIC;
-    // String is a class for string.
-    private static final String MESSAGE = Constants.MESSAGE;
-    // Socket is a class for socket.
-    private static Socket SOCKET;
-    // SocketAddress
-    private static SocketAddress SOCKET_ADDRESS;
+    private static KafkaProducer<String, String> kafkaProducer;
+    // Client is a class for client.
+    private static Client client;
 
     // Main method is a main method of this project.
     public static void main(String[] args) {
         // initialize
-        LOGGER.info("Initializing...");
         initialize();
-        // start
-        LOGGER.info("Starting...");
-        start();
+        // run
+        run();
         // shutdown
-        LOGGER.info("Shutdown...");
         shutdown();
     }
 
-    private static SocketAddress getSocketAddress() {
-        return new SocketAddress() {
-            @Override
-            public String toString() {
-                return Constants.HOST_NAME + ":" + Constants.SOCKET_PORT;
+    private static void shutdown() {
+        // shutdown kafka consumer
+        kafkaConsumer.close();
+        // shutdown kafka producer
+        kafkaProducer.close();
+        // shutdown executor service
+        executorService.shutdown();
+    }
+
+    private static void run() {
+        // run
+        executorService.execute(() -> {
+            // run
+            try {
+                // run
+                runKafkaConsumer();
+            } catch (Exception e) {
+                // error
+                logger.log(Level.SEVERE, e.getMessage(), e);
             }
-        };
-    }
-
-    private static Socket getSocket() {
-        try {
-            return new Socket(Constants.HOST_NAME, Constants.SOCKET_PORT);
-        } catch (IOException e) {
-            LOGGER.log(Level.SEVERE, "Failed to get socket.", e);
-            return null;
-        }
-    }
-
-    // initialize method is a method for initializing.
-    private static void initialize() {
-        // socket
-        SOCKET = getSocket();
-        // socket address
-        SOCKET_ADDRESS = getSocketAddress();
-        // connect to kafka
-        LOGGER.info("Connecting to kafka...");
-        connectToKafka();
-        // connect to socket
-        LOGGER.info("Connecting to socket...");
-        connectToSocket();
-    }
-
-    private static void connectToSocket() {
-        try {
-            SOCKET.connect(SOCKET_ADDRESS);
-        } catch (IOException e) {
-            LOGGER.log(Level.SEVERE, "Failed to connect to socket.", e);
-        }
-
-        try {
-            SOCKET.setSoTimeout(Constants.TIMEOUT);
-        } catch (SocketException e) {
-            LOGGER.log(Level.SEVERE, "Failed to set socket timeout.", e);
-        }
-
-        try {
-            SOCKET.setKeepAlive(true);
-        } catch (SocketException e) {
-            LOGGER.log(Level.SEVERE, "Failed to set keep alive.", e);
-        }
-
-        try {
-            SOCKET.setTcpNoDelay(true);
-        } catch (SocketException e) {
-            LOGGER.log(Level.SEVERE, "Failed to set tcp no delay.", e);
-        }
-
-        try {
-            SOCKET.setSoLinger(true, Constants.TIMEOUT);
-        } catch (SocketException e) {
-            LOGGER.log(Level.SEVERE, "Failed to set so linger.", e);
-        }
-
-        try {
-            SOCKET.setReuseAddress(true);
-        } catch (SocketException e) {
-            LOGGER.log(Level.SEVERE, "Failed to set reuse address.", e);
-        }
-    }
-
-    private static void connectToKafka() {
-        try {
-            KAFKA_CONSUMER.subscribe(Constants.TOPICS);
-        } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, "Failed to connect to kafka.", e);
-        }
-    }
-
-    // start method is a method for starting.
-    private static void start() {
-        // start kafka consumer
-        LOGGER.info("Starting kafka consumer...");
-        startKafkaConsumer();
-        // start kafka producer
-        LOGGER.info("Starting kafka producer...");
-        startKafkaProducer();
-        // start socket
-        LOGGER.info("Starting socket...");
-        startSocket();
-        // start executor service
-        LOGGER.info("Starting executor service...");
-        startExecutorService();
-    }
-    private static void startExecutorService() {
-        EXECUTOR_SERVICE.execute(() -> {
-            while (true) {
-                try {
-                    // get records
-                    ConsumerRecords<String, String> records = KAFKA_CONSUMER.poll(Duration.ofMillis(1000));
-                    // get record
-                    for (ConsumerRecord<String, String> record : records) {
-                        // get message
-                        String message = record.value();
-                        // send message
-                        sendMessage(message);
-                    }
-                } catch (Exception e) {
-                    LOGGER.log(Level.SEVERE, "Failed to get records.", e);
-                }
+        });
+        executorService.execute(() -> {
+            // run
+            try {
+                // run
+                runKafkaProducer();
+            } catch (Exception e) {
+                // error
+                logger.log(Level.SEVERE, e.getMessage(), e);
+            }
+        });
+        executorService.execute(() -> {
+            // run
+            try {
+                // run
+                runClient();
+            } catch (Exception e) {
+                // error
+                logger.log(Level.SEVERE, e.getMessage(), e);
             }
         });
     }
 
-    private static void sendMessage(String message2) {
+    private static void runKafkaConsumer() {
+        // run
         try {
-            ProducerRecord<String, String> record = new ProducerRecord<>(Constants.TOPIC, message2);
-            KAFKA_PRODUCER.send(record);
-        } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, "Failed to send message.", e);
-        }
-    }
-
-    private static void startSocket() {
-        try {
-            SOCKET.setSoTimeout(Constants.TIMEOUT);
-        } catch (SocketException e) {
-            LOGGER.log(Level.SEVERE, "Failed to set socket timeout.", e);
-        }
-        while (true) {
-            try {
-                // get message
-                String message = ((DataInputStream) SOCKET.getInputStream()).readUTF();
-                // send message
-                sendMessage(message);
-            } catch (SocketTimeoutException e) {
-                LOGGER.log(Level.SEVERE, "Failed to get message.", e);
-            } catch (IOException e) {
-                LOGGER.log(Level.SEVERE, "Failed to get message.", e);
-            }
-        }
-    }
-
-    private static void startKafkaProducer() {
-        try {
-            KAFKA_PRODUCER.initTransactions();
-        } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, "Failed to init transactions.", e);
-        }
-        while (true) {
-            try {
-                // get message
-                String message = MESSAGE;
-                // send message
-                sendMessage(message);
-            } catch (Exception e) {
-                LOGGER.log(Level.SEVERE, "Failed to send message.", e);
-            }
-        }
-    }
-
-    private static void startKafkaConsumer() {
-        while (true) {
-            try {
-                // get records
-                ConsumerRecords<String, String> records = KAFKA_CONSUMER.poll(Duration.ofMillis(1000));
-                // get record
+            // run
+            while (true) {
+                // run
+                ConsumerRecords<String, String> records = kafkaConsumer.poll(Duration.ofMillis(100));
+                // run
                 for (ConsumerRecord<String, String> record : records) {
-                    // get message
-                    String message = record.value();
-                    // send message
-                    sendMessage(message);
+                    // run
+                    logger.log(Level.INFO, "Received message: " + record.value());
                 }
-            } catch (Exception e) {
-                LOGGER.log(Level.SEVERE, "Failed to get records.", e);
             }
+        } catch (Exception e) {
+            // error
+            logger.log(Level.SEVERE, e.getMessage(), e);
         }
     }
 
-    // shutdown method is a method for shutting down.
-    private static void shutdown() {
-        // shutdown kafka consumer
-        LOGGER.info("Shutting down kafka consumer...");
-        shutdownKafkaConsumer();
-        // shutdown kafka producer
-        LOGGER.info("Shutting down kafka producer...");
-        shutdownKafkaProducer();
-        // shutdown socket
-        LOGGER.info("Shutting down socket...");
-        shutdownSocket();
-        // shutdown executor service
-        LOGGER.info("Shutting down executor service...");
-        shutdownExecutorService();
-    }
-
-    private static void shutdownExecutorService() {
-        EXECUTOR_SERVICE.shutdown();
+    private static void runKafkaProducer() {
+        // run
         try {
-            EXECUTOR_SERVICE.awaitTermination(Constants.TIMEOUT, TimeUnit.MILLISECONDS);
-        } catch (InterruptedException e) {
-            LOGGER.log(Level.SEVERE, "Failed to await termination.", e);
+            // run
+            while (true) {
+                // run
+                String message = readMessage();
+                // run
+                if (message != null) {
+                    // run
+                    kafkaProducer.send(new ProducerRecord<String, String>(Constants.KAFKA_TOPIC, message));
+                }
+            }
+        } catch (Exception e) {
+            // error
+            logger.log(Level.SEVERE, e.getMessage(), e);
         }
     }
 
-    private static void shutdownSocket() {
+    private static String readMessage() {
+        // run
         try {
-            SOCKET.close();
+            // run
+            BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+            // run
+            return reader.readLine();
         } catch (IOException e) {
-            LOGGER.log(Level.SEVERE, "Failed to close socket.", e);
+            // error
+            logger.log(Level.SEVERE, e.getMessage(), e);
+            // run
+            return null;
         }
     }
 
-    private static void shutdownKafkaProducer() {
-        try {
-            KAFKA_PRODUCER.close();
-        } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, "Failed to close kafka producer.", e);
-        }
+    private static void runClient() {
+        // run
+        client.run();
     }
 
-    private static void shutdownKafkaConsumer() {
-        try {
-            KAFKA_CONSUMER.close();
-        } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, "Failed to close kafka consumer.", e);
-        }
+    private static void initialize() {
+        // initialize kafka consumer
+        kafkaConsumer = new KafkaConsumer<>(Constants.KAFKA_CONSUMER_PROPERTIES);
+        // initialize kafka producer
+        kafkaProducer = new KafkaProducer<>(Constants.KAFKA_PRODUCER_PROPERTIES);
+        // initialize client
+        client = new Client();
     }
 }
-// Client is a class for client.
-class Client implements Runnable {
+
+// Client class is a class for client.
+class Client {
     // Logger is a class for logging.
-    private static final Logger LOGGER = Logger.getLogger(Client.class.getName());
+    private static Logger logger = Logger.getLogger(Client.class.getName());
     // Socket is a class for socket.
-    private Socket socket;
+    private static Socket socket;
     // BufferedReader is a class for buffered reader.
-    private BufferedReader bufferedReader;
+    private static BufferedReader reader;
     // BufferedWriter is a class for buffered writer.
-    private BufferedWriter bufferedWriter ;
-    // String is a class for string.
-    private String message;
+    private static BufferedWriter writer;
 
-    // constructor
-    public Client(Socket socket) {
-        // Socket is a class for socket.
-        this.socket = socket;
-        // String is a class for string.
-        this.message = null;
-
-        // BufferedReader is a class for buffered reader.
+    // run method is a method for running this class.
+    public void run() {
+        // run
         try {
-            // BufferedReader is a class for buffered reader.
-            this.bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            // BufferedWriter is a class for buffered writer.
-            this.bufferedWriter = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
+            // run
+            socket = new Socket(Constants.SERVER_HOST, Constants.SERVER_PORT);
+            // run
+            reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            // run
+            writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
+            // run
+            while (true) {
+                // run
+                String message = readMessage();
+                // run
+                if (message != null) {
+                    // run
+                    writer.write(message);
+                    // run
+                    writer.newLine();
+                    // run
+                    writer.flush();
+                }
+            }
+        } catch (SocketException e) {
+            // error
+            logger.log(Level.SEVERE, e.getMessage(), e);
         } catch (IOException e) {
-            // Logger is a class for logging.
-            LOGGER.log(Level.SEVERE, e.getMessage(), e);
+            // error
+            logger.log(Level.SEVERE, e.getMessage(), e);
+        } finally {
+            // run
+            shutdown();
         }
     }
 
-    // run method is a method for running.
-    @Override
-    public void run() {
-        // while loop
-        while (true) {
-            // try catch
+    private static String readMessage() {
+        // run
+        try {
+            // run
+            return reader.readLine();
+        } catch (IOException e) {
+            // error
+            logger.log(Level.SEVERE, e.getMessage(), e);
+            // run
+            return null;
+        }
+    }
+
+    private static void shutdown() {
+        // shutdown socket
+        if (socket != null) {
+            // run
             try {
-                // String is a class for string.
-                String message = bufferedReader.readLine();
-                // String is a class for string.
-                this.message = message;
-                // Logger is a class for logging.
-                LOGGER.info(message);
+                // run
+                socket.close();
             } catch (IOException e) {
-                // Logger is a class for logging.
-                LOGGER.log(Level.SEVERE, e.getMessage(), e);
+                // error
+                logger.log(Level.SEVERE, e.getMessage(), e);
             }
         }
     }
 }
+
