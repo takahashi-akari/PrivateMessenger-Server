@@ -94,6 +94,9 @@ public class Constants {
     public static long SLEEP_TIME = 1000;
     public static long CLIENT_SLEEP_TIME = 1000;
     public static long KAFKA_CONSUMER_SLEEP_TIME = 1000;
+    public static Collection<String> KAFKA_TOPIC_NAME = new ArrayList<String>() {{
+        add(TOPIC);
+    }};
     
     // KAFKA_PROPERTIES
     static {
