@@ -15,6 +15,7 @@
 package mn.akari.maven.privatemessengerserver;
 
 import java.io.IOException;
+import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketAddress;
 import java.net.SocketException;
@@ -67,8 +68,22 @@ public class App {
 
         // sleep
         sleep();
+
+        // shutdown
+        shutdown();
     }
     
+    private static void shutdown() {
+        // shutdown kafka consumer
+        kafkaConsumer.close();
+        // shutdown kafka producer
+        kafkaProducer.close();
+        // shutdown executor service
+        executorService.shutdown();
+        // shutdown client
+        client.shutdown();
+    }
+
     private static void sleep() {
         try {
             Thread.sleep(Duration.ofSeconds(10).toMillis());
@@ -112,7 +127,7 @@ public class App {
         // run
         try {
             // run
-            kafkaConsumer.subscribe(List.of(Constants.KAFKA_TOPIC_NAME));
+            kafkaConsumer.subscribe(Collections.singletonList(Constants.KAFKA_TOPIC_NAME));
             while (true) {
                 // run
                 ConsumerRecords<String, String> records = kafkaConsumer.poll(Duration.ofSeconds(1));
@@ -153,6 +168,8 @@ public class App {
 class Client {
     // Logger is a class for logging.
     private static Logger logger = Logger.getLogger(Client.class.getName());
+    // ServerSocket is a class for server socket.
+    private static ServerSocket serverSocket;
     // Socket is a class for socket.
     private static Socket socket;
     // BufferedReader is a class for buffered reader.
@@ -164,9 +181,15 @@ class Client {
     public void run() {
         // run
         try {
-            // run
-            // create socket
-            socket = new Socket(Constants.SERVER_HOST, Constants.SERVER_PORT);
+            try (// run
+                // create socket
+                ServerSocket serverSocket = new ServerSocket(Constants.SERVER_PORT)) {
+                // accept socket
+                socket = serverSocket.accept();
+            } catch (Exception e) {
+                logger.log(Level.SEVERE, "Exception", e);
+                throw e;
+            }
             // create reader
             reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             // create writer
@@ -181,6 +204,15 @@ class Client {
         } catch (Exception e) {
             // error
             logger.log(Level.SEVERE, e.getMessage(), e);
+
+            // server socket close
+            if (serverSocket != null) {
+                try {
+                    serverSocket.close();
+                } catch (Exception e2) {
+                    logger.log(Level.SEVERE, e2.getMessage(), e2);
+                }
+            }
         }
     }
 
@@ -269,6 +301,14 @@ class Client {
             // run
             // close socket
             socket.close();
+        } catch (IOException e) {
+            // error
+            logger.log(Level.SEVERE, e.getMessage(), e);
+        }
+        // serversocket close
+        try {
+            // run
+            serverSocket.close();
         } catch (IOException e) {
             // error
             logger.log(Level.SEVERE, e.getMessage(), e);

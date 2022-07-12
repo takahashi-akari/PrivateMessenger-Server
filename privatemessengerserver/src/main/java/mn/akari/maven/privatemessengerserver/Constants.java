@@ -81,7 +81,7 @@ public class Constants {
     // SERVER_HOST
     public static final String SERVER_HOST = "127.0.0.1";
     // SERVER_PORT
-    public static final int SERVER_PORT = 9092;
+    public static final int SERVER_PORT = 8080;
 
     // private static field 
     private static ArrayList<String> KAFKA_PRODUCER_TOPICS;
