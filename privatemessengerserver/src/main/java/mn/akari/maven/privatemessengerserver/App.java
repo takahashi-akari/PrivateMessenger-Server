@@ -95,7 +95,7 @@ public class App {
                                 logger.log(Level.SEVERE, "kafka consumer: {0}", e.getMessage());
                             }
                             // poll
-                            ConsumerRecords<String, String> records = kafkaConsumer.poll(Duration.ofMillis(Constants.KAFKA_CONSUMER_POLL_TIMEOUT));g
+                            ConsumerRecords<String, String> records = kafkaConsumer.poll(Duration.ofMillis(Constants.KAFKA_CONSUMER_POLL_TIMEOUT));
                             // loop
                             for (ConsumerRecord<String, String> record : records) {
                                 // log
