@@ -1,5 +1,5 @@
 // @title Private Messenger Server - App
-// @version 0.0.19
+// @version 0.0.20
 // @author Takahashi Akari <akaritakahashioss@gmail.com>
 // @date 2022-07-09
 // @description This is a private messenger server. App.java contains main method.
@@ -86,8 +86,58 @@ public class App {
                 while (true) {
                     // executor loop
                     try {
-                        // executor loop
-                        Thread.sleep(1000);
+                        while (true) {
+                            // sleep
+                            try {
+                                Thread.sleep(Constants.KAFKA_CONSUMER_SLEEP_TIME);
+                            } catch (InterruptedException e) {
+                                // log
+                                logger.log(Level.SEVERE, "kafka consumer: {0}", e.getMessage());
+                            }
+                            // poll
+                            ConsumerRecords<String, String> records = kafkaConsumer.poll(Duration.ofMillis(Constants.KAFKA_CONSUMER_POLL_TIMEOUT));g
+                            // loop
+                            for (ConsumerRecord<String, String> record : records) {
+                                // log
+                                logger.log(Level.INFO, "kafka consumer: {0}", record.value());
+                                // send message to client
+                                client.sendMessage(record.value());
+                            }
+
+                            // log
+                            logger.log(Level.INFO, "kafka consumer: {0}", "poll");
+                
+                            // sleep
+                            try {
+                                Thread.sleep(Constants.KAFKA_CONSUMER_SLEEP_TIME);
+                            } catch (InterruptedException e) {
+                                // log
+                                logger.log(Level.SEVERE, "kafka consumer: {0}", e.getMessage());
+                            }
+                
+                            // commit offsets
+                            kafkaConsumer.commitSync();
+
+                            // log
+                            logger.log(Level.INFO, "kafka consumer: committed offsets");
+
+                            // sleep
+                            try {
+                                Thread.sleep(Constants.KAFKA_CONSUMER_SLEEP_TIME);
+                            } catch (InterruptedException e) {
+                                // log
+                                logger.log(Level.SEVERE, "kafka consumer: {0}", e.getMessage());
+                            }
+
+                            // get Clienet Message
+                            String message = client.getMessage();
+                            
+                            // send producer message
+                            kafkaProducer.send(new ProducerRecord<String, String>(Constants.KAFKA_PRODUCER_TOPIC, message));
+
+                            // log
+                            logger.log(Level.INFO, "kafka producer: {0}", message);
+                        }
                     } catch (InterruptedException e) {
                         // log
                         logger.log(Level.SEVERE, e.getMessage(), e);
@@ -118,68 +168,34 @@ public class App {
     }
     private static void runKafkaConsumer() {
         // run kafka consumer
-        executorService.execute(() -> {
-            // create kafka consumer
-            kafkaConsumer = new KafkaConsumer<>(Constants.KAFKA_CONSUMER_PROPERTIES);
-            // subscribe topics
-            kafkaConsumer.subscribe(Constants.KAFKA_CONSUMER_TOPICS);
-            // loop
-            while (true) {
-                // sleep
-                try {
-                    Thread.sleep(Constants.KAFKA_CONSUMER_SLEEP_TIME);
-                } catch (InterruptedException e) {
-                    // log
-                    logger.log(Level.SEVERE, "kafka consumer: {0}", e.getMessage());
-                }
-                // poll
-                ConsumerRecords<String, String> records = kafkaConsumer.poll(Duration.ofMillis(Constants.KAFKA_CONSUMER_POLL_TIMEOUT));
-                // loop
-                for (ConsumerRecord<String, String> record : records) {
-                    // log
-                    logger.log(Level.INFO, "kafka consumer: {0}", record.value());
-                    // send message to client
-                    client.sendMessage(record.value());
-                }
+        // create kafka consumer
+        kafkaConsumer = new KafkaConsumer<>(Constants.KAFKA_CONSUMER_PROPERTIES);
+        // subscribe topics
+        kafkaConsumer.subscribe(Constants.KAFKA_CONSUMER_TOPICS);
 
-                // sleep
-                try {
-                    Thread.sleep(Constants.KAFKA_CONSUMER_SLEEP_TIME);
-                } catch (InterruptedException e) {
-                    // log
-                    logger.log(Level.SEVERE, "kafka consumer: {0}", e.getMessage());
-                }
-
-                // commit offsets
-                kafkaConsumer.commitSync();
-            }
-        });
-
+        // sleep
+        try {
+            Thread.sleep(Constants.KAFKA_CONSUMER_SLEEP_TIME);
+        } catch (InterruptedException e) {
+            // log
+            logger.log(Level.SEVERE, e.getMessage(), e);
+        }
+        
         // log
         logger.log(Level.INFO, "kafka consumer: started");
     }
 
     private static void runKafkaProducer() {
-        // run kafka producer
-        executorService.execute(() -> {
-            // create kafka producer
-            kafkaProducer = new KafkaProducer<>(Constants.KAFKA_PRODUCER_PROPERTIES);
-            // loop
-            while (true) {
-                // sleep
-                try {
-                    Thread.sleep(Constants.KAFKA_PRODUCER_SLEEP_TIME);
-                } catch (InterruptedException e) {
-                    // log
-                    logger.log(Level.SEVERE, "kafka producer: " + e.getMessage());
-                }
-                // send to kafka consumer
-                ProducerRecord<String, String> producerRecord = new ProducerRecord<>(Constants.KAFKA_CONSUMER_TOPIC, "hello");
-                kafkaProducer.send(producerRecord);
-            }
-        });
+        kafkaProducer = new KafkaProducer<>(Constants.KAFKA_PRODUCER_PROPERTIES);
 
-        // log
+        // sleep
+        try {
+            Thread.sleep(Constants.KAFKA_PRODUCER_SLEEP_TIME);
+        } catch (InterruptedException e) {
+            // log
+            logger.log(Level.SEVERE, e.getMessage(), e);
+        }
+
         logger.log(Level.INFO, "kafka producer: started");
     }
 
@@ -199,33 +215,15 @@ public class App {
     }
 
     private static void runClient() {
-        // run client
-        executorService.execute(() -> {
-            // create client
-            client = new Client();
-            // loop
-            while (true) {
-                // sleep
-                try {
-                    Thread.sleep(Constants.CLIENT_SLEEP_TIME);
-                } catch (InterruptedException e) {
-                    // log
-                    logger.log(Level.SEVERE, "client: " + e.getMessage());
-                }
+        client = new Client();
 
-                // read message
-                String message = readMessage();
-                // message check
-                if (message == null) {
-                    // error
-                    logger.log(Level.SEVERE, "client: message is null");
-                    // continue
-                    continue;
-                }
-                // send message
-                client.send(message);
-            }
-        });
+        // sleep
+        try {
+            Thread.sleep(Constants.CLIENT_SLEEP_TIME);
+        } catch (InterruptedException e) {
+            // log
+            logger.log(Level.SEVERE, e.getMessage(), e);
+        }
 
         // log
         logger.log(Level.INFO, "client: started");
