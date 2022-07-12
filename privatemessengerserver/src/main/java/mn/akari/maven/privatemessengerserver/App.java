@@ -139,8 +139,8 @@ public class App {
             KAFKA_PROPERTIES.put("value.deserializer","org.apache.kafka.common.serialization.StringDeserializer");
             KAFKA_PROPERTIES.put("partition.assignment.strategy", "range");
             // initialize
-            kafkaConsumer = new KafkaConsumer<>(new Properties(KAFKA_PROPERTIES));
-            kafkaProducer = new KafkaProducer<>(new Properties(KAFKA_PROPERTIES));
+            kafkaConsumer = new KafkaConsumer<>(KAFKA_PROPERTIES);
+            kafkaProducer = new KafkaProducer<>(KAFKA_PROPERTIES);
             client = new Client();
         } catch (Exception e) {
             logger.log(Level.SEVERE, "Exception", e);
