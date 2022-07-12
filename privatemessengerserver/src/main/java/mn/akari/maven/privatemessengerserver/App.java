@@ -60,207 +60,80 @@ public class App {
     public static void main(String[] args) {
         // initialize
         initialize();
+
         // run
         run();
-        // executor loop
-        executorLoop();
-        // shutdown
-        shutdown();
-        // system exit
-        System.exit(0);
+
+        // sleep
+        sleep();
     }
-
-    private static void executorLoop() {
-        // executor loop
-        while (true) {
-            try {
-                // sleep
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                // log
-                logger.log(Level.SEVERE, e.getMessage(), e);
-            }
-            // executor loop
-            executorService.execute(() -> {
-                // executor loop
-                while (true) {
-                    // executor loop
-                    try {
-                        while (true) {
-                            // sleep
-                            try {
-                                Thread.sleep(Constants.KAFKA_CONSUMER_SLEEP_TIME);
-                            } catch (InterruptedException e) {
-                                // log
-                                logger.log(Level.SEVERE, "kafka consumer: {0}", e.getMessage());
-                            }
-                            // poll
-                            ConsumerRecords<String, String> records = kafkaConsumer.subscribe(Constants.KAFKA_TOPIC_NAME);
-                            // loop
-                            for (ConsumerRecord<String, String> record : records) {
-                                // log
-                                logger.log(Level.INFO, "kafka consumer: {0}", record.value());
-                                // send message to client
-                                client.sendMessage(record.value());
-                            }
-
-                            // log
-                            logger.log(Level.INFO, "kafka consumer: {0}", "poll");
-                
-                            // sleep
-                            try {
-                                Thread.sleep(Constants.KAFKA_CONSUMER_SLEEP_TIME);
-                            } catch (InterruptedException e) {
-                                // log
-                                logger.log(Level.SEVERE, "kafka consumer: {0}", e.getMessage());
-                            }
-                
-                            // commit offsets
-                            kafkaConsumer.commitSync();
-
-                            // log
-                            logger.log(Level.INFO, "kafka consumer: committed offsets");
-
-                            // sleep
-                            try {
-                                Thread.sleep(Constants.KAFKA_CONSUMER_SLEEP_TIME);
-                            } catch (InterruptedException e) {
-                                // log
-                                logger.log(Level.SEVERE, "kafka consumer: {0}", e.getMessage());
-                            }
-
-                            // get Clienet Message
-                            String message = client.getMessage();
-                            
-                            // send producer message
-                            kafkaProducer.send(new ProducerRecord<String, String>(Constants.KAFKA_PRODUCER_TOPIC, message));
-
-                            // log
-                            logger.log(Level.INFO, "kafka producer: {0}", message);
-                        }
-                    } catch (Exception e) {
-                        // log
-                        logger.log(Level.SEVERE, e.getMessage(), e);
-                    }
-                }
-            });
+    
+    private static void sleep() {
+        try {
+            Thread.sleep(Duration.ofSeconds(10).toMillis());
+        } catch (InterruptedException e) {
+            logger.log(Level.SEVERE, "InterruptedException", e);
         }
-    }
-
-    private static void shutdown() {
-        // shutdown kafka consumer
-        kafkaConsumer.close();
-        // shutdown kafka producer
-        kafkaProducer.close();
-        // shutdown executor service
-        executorService.shutdown();
-        // shutdown client
-        client.shutdown();
     }
 
     private static void run() {
-        // run kafka consumer
-        runKafkaConsumer();
-        // run kafka producer
-        runKafkaProducer();
-        // run client
-        runClient();
-    }
-    private static void runKafkaConsumer() {
-        // run kafka consumer
-        // create kafka consumer
-        kafkaConsumer = new KafkaConsumer<>(Constants.KAFKA_CONSUMER_PROPERTIES);
-        // subscribe topics
-        kafkaConsumer.subscribe(Constants.KAFKA_CONSUMER_TOPICS);
-
-        // sleep
-        try {
-            Thread.sleep(Constants.KAFKA_CONSUMER_SLEEP_TIME);
-        } catch (InterruptedException e) {
-            // log
-            logger.log(Level.SEVERE, e.getMessage(), e);
-        }
-        
-        // log
-        logger.log(Level.INFO, "kafka consumer: started");
-    }
-
-    private static void runKafkaProducer() {
-        kafkaProducer = new KafkaProducer<>(Constants.KAFKA_PRODUCER_PROPERTIES);
-
-        // sleep
-        try {
-            Thread.sleep(Constants.KAFKA_PRODUCER_SLEEP_TIME);
-        } catch (InterruptedException e) {
-            // log
-            logger.log(Level.SEVERE, e.getMessage(), e);
-        }
-
-        logger.log(Level.INFO, "kafka producer: started");
-    }
-
-    private static String readMessage() {
         // run
-        try {
+        executorService.execute(() -> {
             // run
-            BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+            runKafkaConsumer();
+        });
+        executorService.execute(() -> {
             // run
-            return reader.readLine();
-        } catch (IOException e) {
-            // error
-            logger.log(Level.SEVERE, e.getMessage(), e);
+            runKafkaProducer();
+        });
+        executorService.execute(() -> {
             // run
-            return null;
-        }
+            runClient();
+        });
     }
 
     private static void runClient() {
-        client = new Client();
+        // run
+        client.run();
+    }
 
-        // sleep
+    private static void runKafkaProducer() {
+        // run
         try {
-            Thread.sleep(Constants.CLIENT_SLEEP_TIME);
-        } catch (InterruptedException e) {
-            // log
-            logger.log(Level.SEVERE, e.getMessage(), e);
+            // run
+            kafkaProducer.send(new ProducerRecord<String, String>("test", "test"));
+        } catch (Exception e) {
+            logger.log(Level.SEVERE, "Exception", e);
         }
+    }
 
-        // log
-        logger.log(Level.INFO, "client: started");
+    private static void runKafkaConsumer() {
+        // run
+        try {
+            // run
+            kafkaConsumer.subscribe(List.of("topic1"));
+            while (true) {
+                // run
+                ConsumerRecords<String, String> records = kafkaConsumer.poll(Duration.ofSeconds(1));
+                for (ConsumerRecord<String, String> record : records) {
+                    // run
+                    logger.info(record.value());
+                }
+            }
+        } catch (Exception e) {
+            logger.log(Level.SEVERE, "Exception", e);
+        }
     }
 
     private static void initialize() {
         // initialize
         try {
             // initialize
-            // KAFKA_CONSUMER_CONFIG
-            Properties KAFKA_CONSUMER_CONFIG = new Properties();
-            KAFKA_CONSUMER_CONFIG.put("bootstrap.servers", Constants.KAFKA_SERVER);
-            KAFKA_CONSUMER_CONFIG.put("group.id", Constants.KAFKA_GROUP_ID);
-            KAFKA_CONSUMER_CONFIG.put("enable.auto.commit", "true");
-            KAFKA_CONSUMER_CONFIG.put("auto.commit.interval.ms", "1000");
-            KAFKA_CONSUMER_CONFIG.put("session.timeout.ms", "30000");
-            KAFKA_CONSUMER_CONFIG.put("key.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
-            KAFKA_CONSUMER_CONFIG.put("value.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
-            // KAFKA_PRODUCER_CONFIG
-            Properties KAFKA_PRODUCER_CONFIG = new Properties();
-            KAFKA_PRODUCER_CONFIG.put("bootstrap.servers", Constants.KAFKA_SERVER);
-            KAFKA_PRODUCER_CONFIG.put("acks", "all");
-            KAFKA_PRODUCER_CONFIG.put("retries", 0);
-            KAFKA_PRODUCER_CONFIG.put("batch.size", 16384);
-            KAFKA_PRODUCER_CONFIG.put("linger.ms", 1);
-            KAFKA_PRODUCER_CONFIG.put("buffer.memory", 33554432);
-            KAFKA_PRODUCER_CONFIG.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer");
-            KAFKA_PRODUCER_CONFIG.put("value.serializer", "org.apache.kafka.common.serialization.StringSerializer");
-            // initialize kafka consumer
-            kafkaConsumer = new KafkaConsumer<>(KAFKA_CONSUMER_CONFIG);
-            // initialize kafka producer
-            kafkaProducer = new KafkaProducer<>(KAFKA_PRODUCER_CONFIG);
-            // initialize client
+            kafkaConsumer = new KafkaConsumer<>(new Properties(Constants.KAFKA_CONSUMER_PROPERTIES));
+            kafkaProducer = new KafkaProducer<>(new Properties(Constants.KAFKA_PRODUCER_PROPERTIES));
             client = new Client();
         } catch (Exception e) {
-            // error
-            logger.log(Level.SEVERE, e.getMessage(), e);
+            logger.log(Level.SEVERE, "Exception", e);
         }
     }
 }
@@ -298,6 +171,24 @@ class Client {
             // error
             logger.log(Level.SEVERE, e.getMessage(), e);
         }
+    }
+
+    public void message(String message) {
+        // message
+        try {
+            // message
+            writer.write(message);
+            // message
+            writer.newLine();
+            // message
+            writer.flush();
+        } catch (IOException e) {
+            // error
+            logger.log(Level.SEVERE, e.getMessage(), e);
+        }
+
+        // log
+        logger.log(Level.INFO, "client: {0}", message);
     }
 
     public void sendMessage(String value) {

@@ -15,6 +15,7 @@
     
 package mn.akari.maven.privatemessengerserver;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Properties;
@@ -97,6 +98,11 @@ public class Constants {
     public static Collection<String> KAFKA_TOPIC_NAME = new ArrayList<String>() {{
         add(TOPIC);
     }};
+    public static Collection<String> KAFKA_TOPIC_LIST = new ArrayList<String>() {{
+        add(TOPIC);
+    }};
+    public static long SHUTDOWN_TIMEOUT = 1000;
+    public static Duration KAFKA_CONSUMER_POLL_TIME = Duration.ofMillis(1000);
     
     // KAFKA_PROPERTIES
     static {
@@ -142,6 +148,14 @@ public class Constants {
         KAFKA_CONSUMER_PROPERTIES.put("max.poll.records", 1);
         KAFKA_CONSUMER_PROPERTIES.put("max.poll.interval.ms", 100);
         KAFKA_CONSUMER_PROPERTIES.put("poll.timeout.ms", 5000);
+
+        KAFKA_CONSUMER_PROPERTIES.put("acks", "all");
+        KAFKA_CONSUMER_PROPERTIES.put("retries", 0);
+        KAFKA_CONSUMER_PROPERTIES.put("batch.size", 16384);
+        KAFKA_CONSUMER_PROPERTIES.put("linger.ms", 1);
+        KAFKA_CONSUMER_PROPERTIES.put("buffer.memory", 33554432);
+        KAFKA_CONSUMER_PROPERTIES.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer");
+        KAFKA_CONSUMER_PROPERTIES.put("value.serializer", "org.apache.kafka.common.serialization.StringSerializer");        
     }
     // KAFKA_PRODUCER_PROPERTIES
     static {
