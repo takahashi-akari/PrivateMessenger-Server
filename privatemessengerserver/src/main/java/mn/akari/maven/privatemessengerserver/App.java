@@ -69,7 +69,6 @@ public class App {
     private static void shutdown() {
         // shutdown kafka consumer
         kafkaConsumer.close();
-        kafkaConsumer.wakeup();
         // shutdown kafka producer
         kafkaProducer.close();
         // shutdown executor service
@@ -95,16 +94,33 @@ public class App {
             kafkaConsumer.subscribe(Constants.KAFKA_CONSUMER_TOPICS);
             // loop
             while (true) {
+                // sleep
+                try {
+                    Thread.sleep(Constants.KAFKA_CONSUMER_SLEEP_TIME);
+                } catch (InterruptedException e) {
+                    // log
+                    logger.log(Level.SEVERE, "kafka consumer: {0}", e.getMessage());
+                }
                 // poll
                 ConsumerRecords<String, String> records = kafkaConsumer.poll(Duration.ofMillis(Constants.KAFKA_CONSUMER_POLL_TIMEOUT));
                 // loop
                 for (ConsumerRecord<String, String> record : records) {
                     // log
-                    logger.log(Level.INFO, "kafka consumer: " + record.value());
-                    // send to kafka producer
-                    ProducerRecord<String, String> producerRecord = new ProducerRecord<>(Constants.KAFKA_PRODUCER_TOPIC, record.value());
-                    kafkaProducer.send(producerRecord);
+                    logger.log(Level.INFO, "kafka consumer: {0}", record.value());
+                    // send message to client
+                    client.sendMessage(record.value());
                 }
+
+                // sleep
+                try {
+                    Thread.sleep(Constants.KAFKA_CONSUMER_SLEEP_TIME);
+                } catch (InterruptedException e) {
+                    // log
+                    logger.log(Level.SEVERE, "kafka consumer: {0}", e.getMessage());
+                }
+
+                // commit offsets
+                kafkaConsumer.commitSync();
             }
         });
 
@@ -253,6 +269,23 @@ class Client {
             // error
             logger.log(Level.SEVERE, e.getMessage(), e);
         }
+    }
+
+    public void sendMessage(String value) {
+        // run
+        try {
+            // run
+            // send message
+            writer.write(value);
+            // flush
+            writer.flush();
+        } catch (Exception e) {
+            // error
+            logger.log(Level.SEVERE, e.getMessage(), e);
+        }
+
+        // log
+        logger.log(Level.INFO, "client: send message: " + value);
     }
 
     public String getMessage() {

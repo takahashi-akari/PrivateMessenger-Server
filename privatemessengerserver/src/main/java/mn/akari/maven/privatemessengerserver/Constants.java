@@ -93,6 +93,7 @@ public class Constants {
     public static String KAFKA_CONSUMER_TOPIC = "topic1";
     public static long SLEEP_TIME = 1000;
     public static long CLIENT_SLEEP_TIME = 1000;
+    public static long KAFKA_CONSUMER_SLEEP_TIME = 1000;
     
     // KAFKA_PROPERTIES
     static {
