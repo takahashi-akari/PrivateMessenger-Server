@@ -1,5 +1,5 @@
 // @title Private Messenger Server - App
-// @version 0.0.18
+// @version 0.0.19
 // @author Takahashi Akari <akaritakahashioss@gmail.com>
 // @date 2022-07-09
 // @description This is a private messenger server. App.java contains main method.
@@ -62,8 +62,39 @@ public class App {
         initialize();
         // run
         run();
+        // executor loop
+        executorLoop();
         // shutdown
         shutdown();
+        // system exit
+        System.exit(0);
+    }
+
+    private static void executorLoop() {
+        // executor loop
+        while (true) {
+            try {
+                // sleep
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                // log
+                logger.log(Level.SEVERE, e.getMessage(), e);
+            }
+            // executor loop
+            executorService.execute(() -> {
+                // executor loop
+                while (true) {
+                    // executor loop
+                    try {
+                        // executor loop
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) {
+                        // log
+                        logger.log(Level.SEVERE, e.getMessage(), e);
+                    }
+                }
+            });
+        }
     }
 
     private static void shutdown() {
