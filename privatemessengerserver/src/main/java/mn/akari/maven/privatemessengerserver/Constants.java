@@ -121,8 +121,6 @@ public class Constants {
         KAFKA_PROPERTIES.put("buffer.memory", 33554432);
         KAFKA_PROPERTIES.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer");
         KAFKA_PROPERTIES.put("value.serializer", "org.apache.kafka.common.serialization.StringSerializer");
-        KAFKA_PROPERTIES.put("key.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
-        KAFKA_PROPERTIES.put("value.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
     }
     // KAFKA_CONSUMER_TOPICS
     static {
@@ -147,8 +145,6 @@ public class Constants {
         KAFKA_CONSUMER_PROPERTIES.put("buffer.memory", 33554432);
         KAFKA_CONSUMER_PROPERTIES.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer");
         KAFKA_CONSUMER_PROPERTIES.put("value.serializer", "org.apache.kafka.common.serialization.StringSerializer");
-        KAFKA_CONSUMER_PROPERTIES.put("key.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
-        KAFKA_CONSUMER_PROPERTIES.put("value.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
     }
     // KAFKA_PRODUCER_PROPERTIES
     static {
@@ -167,8 +163,6 @@ public class Constants {
         KAFKA_PRODUCER_PROPERTIES.put("buffer.memory", 33554432);
         KAFKA_PRODUCER_PROPERTIES.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer");
         KAFKA_PRODUCER_PROPERTIES.put("value.serializer", "org.apache.kafka.common.serialization.StringSerializer");
-        KAFKA_CONSUMER_PROPERTIES.put("key.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
-        KAFKA_CONSUMER_PROPERTIES.put("value.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
     }
     // KAFKA_PRODUCER_TOPICS
     static {
