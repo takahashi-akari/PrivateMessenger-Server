@@ -113,7 +113,7 @@ public class Constants {
         KAFKA_PROPERTIES.put("enable.auto.commit", KAFKA_ENABLE_AUTO_COMMIT);
         KAFKA_PROPERTIES.put("max.poll.records", KAFKA_MAX_POLL_RECORDS);
         KAFKA_PROPERTIES.put("max.poll.interval.ms", KAFKA_MAX_POLL_INTERVAL_MS);
-        KAFKA_PROPERTIES.put("poll.timeout.ms", KAFKA_POLL_TIMEOUT);
+        KAFKA_PROPERTIES.put("poll.timeout.ms", KAFKA_CONSUMER_POLL_TIMEOUT);
         KAFKA_PROPERTIES.put("acks", "all");
         KAFKA_PROPERTIES.put("retries", 0);
         KAFKA_PROPERTIES.put("batch.size", 16384);
@@ -121,6 +121,8 @@ public class Constants {
         KAFKA_PROPERTIES.put("buffer.memory", 33554432);
         KAFKA_PROPERTIES.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer");
         KAFKA_PROPERTIES.put("value.serializer", "org.apache.kafka.common.serialization.StringSerializer");
+        KAFKA_PROPERTIES.put("key.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
+        KAFKA_PROPERTIES.put("value.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
     }
     // KAFKA_CONSUMER_TOPICS
     static {
@@ -130,37 +132,43 @@ public class Constants {
     }
     // KAFKA_CONSUMER_PROPERTIES
     static {
-        KAFKA_CONSUMER_PROPERTIES = new Properties();
-        KAFKA_CONSUMER_PROPERTIES.putAll(KAFKA_PROPERTIES);
-        KAFKA_CONSUMER_PROPERTIES.put("auto.offset.reset", "earliest");
-
-        KAFKA_CONSUMER_PROPERTIES.put("topics", KAFKA_CONSUMER_TOPICS);
-
-        KAFKA_CONSUMER_PROPERTIES.put("auto.offset.reset", "earliest");
-        KAFKA_CONSUMER_PROPERTIES.put("enable.auto.commit", false);
-        KAFKA_CONSUMER_PROPERTIES.put("max.poll.records", 1);
-        KAFKA_CONSUMER_PROPERTIES.put("max.poll.interval.ms", 100);
-        KAFKA_CONSUMER_PROPERTIES.put("poll.timeout.ms", 5000);
-
+        KAFKA_CONSUMER_PROPERTIES.put("bootstrap.servers", KAFKA_SERVER);
+        KAFKA_CONSUMER_PROPERTIES.put("client.id", KAFKA_CLIENT_ID);
+        KAFKA_CONSUMER_PROPERTIES.put("group.id", KAFKA_GROUP_ID);
+        KAFKA_CONSUMER_PROPERTIES.put("auto.offset.reset", KAFKA_AUTO_OFFSET_RESET);
+        KAFKA_CONSUMER_PROPERTIES.put("enable.auto.commit", KAFKA_ENABLE_AUTO_COMMIT);
+        KAFKA_CONSUMER_PROPERTIES.put("max.poll.records", KAFKA_MAX_POLL_RECORDS);
+        KAFKA_CONSUMER_PROPERTIES.put("max.poll.interval.ms", KAFKA_MAX_POLL_INTERVAL_MS);
+        KAFKA_CONSUMER_PROPERTIES.put("poll.timeout.ms", KAFKA_CONSUMER_POLL_TIMEOUT);
         KAFKA_CONSUMER_PROPERTIES.put("acks", "all");
         KAFKA_CONSUMER_PROPERTIES.put("retries", 0);
         KAFKA_CONSUMER_PROPERTIES.put("batch.size", 16384);
         KAFKA_CONSUMER_PROPERTIES.put("linger.ms", 1);
         KAFKA_CONSUMER_PROPERTIES.put("buffer.memory", 33554432);
         KAFKA_CONSUMER_PROPERTIES.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer");
-        KAFKA_CONSUMER_PROPERTIES.put("value.serializer", "org.apache.kafka.common.serialization.StringSerializer");        
+        KAFKA_CONSUMER_PROPERTIES.put("value.serializer", "org.apache.kafka.common.serialization.StringSerializer");
+        KAFKA_CONSUMER_PROPERTIES.put("key.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
+        KAFKA_CONSUMER_PROPERTIES.put("value.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
     }
     // KAFKA_PRODUCER_PROPERTIES
     static {
-        KAFKA_PRODUCER_PROPERTIES = new Properties();
-        KAFKA_PRODUCER_PROPERTIES.putAll(KAFKA_PROPERTIES);
-        KAFKA_PRODUCER_PROPERTIES.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer");
-        KAFKA_PRODUCER_PROPERTIES.put("value.serializer", "org.apache.kafka.common.serialization.StringSerializer");
+        KAFKA_PRODUCER_PROPERTIES.put("bootstrap.servers", KAFKA_SERVER);
+        KAFKA_PRODUCER_PROPERTIES.put("client.id", KAFKA_CLIENT_ID);
+        KAFKA_PRODUCER_PROPERTIES.put("group.id", KAFKA_GROUP_ID);
+        KAFKA_PRODUCER_PROPERTIES.put("auto.offset.reset", KAFKA_AUTO_OFFSET_RESET);
+        KAFKA_PRODUCER_PROPERTIES.put("enable.auto.commit", KAFKA_ENABLE_AUTO_COMMIT);
+        KAFKA_PRODUCER_PROPERTIES.put("max.poll.records", KAFKA_MAX_POLL_RECORDS);
+        KAFKA_PRODUCER_PROPERTIES.put("max.poll.interval.ms", KAFKA_MAX_POLL_INTERVAL_MS);
+        KAFKA_PRODUCER_PROPERTIES.put("poll.timeout.ms", KAFKA_PRODUCER_SLEEP_TIME);
         KAFKA_PRODUCER_PROPERTIES.put("acks", "all");
         KAFKA_PRODUCER_PROPERTIES.put("retries", 0);
         KAFKA_PRODUCER_PROPERTIES.put("batch.size", 16384);
         KAFKA_PRODUCER_PROPERTIES.put("linger.ms", 1);
         KAFKA_PRODUCER_PROPERTIES.put("buffer.memory", 33554432);
+        KAFKA_PRODUCER_PROPERTIES.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer");
+        KAFKA_PRODUCER_PROPERTIES.put("value.serializer", "org.apache.kafka.common.serialization.StringSerializer");
+        KAFKA_CONSUMER_PROPERTIES.put("key.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
+        KAFKA_CONSUMER_PROPERTIES.put("value.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
     }
     // KAFKA_PRODUCER_TOPICS
     static {
