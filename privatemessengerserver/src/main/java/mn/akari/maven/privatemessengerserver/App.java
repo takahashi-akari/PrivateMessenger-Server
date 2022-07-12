@@ -69,6 +69,7 @@ public class App {
     private static void shutdown() {
         // shutdown kafka consumer
         kafkaConsumer.close();
+        kafkaConsumer.wakeup();
         // shutdown kafka producer
         kafkaProducer.close();
         // shutdown executor service
