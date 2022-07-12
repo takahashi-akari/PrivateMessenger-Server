@@ -137,7 +137,6 @@ public class App {
             KAFKA_PROPERTIES.put("session.timeout.ms", "30000");
             KAFKA_PROPERTIES.put("key.deserializer","org.apache.kafka.common.serialization.StringDeserializer");  
             KAFKA_PROPERTIES.put("value.deserializer","org.apache.kafka.common.serialization.StringDeserializer");
-            KAFKA_PROPERTIES.put("partition.assignment.strategy", "range");
             // initialize
             kafkaConsumer = new KafkaConsumer<>(KAFKA_PROPERTIES);
             kafkaProducer = new KafkaProducer<>(KAFKA_PROPERTIES);
