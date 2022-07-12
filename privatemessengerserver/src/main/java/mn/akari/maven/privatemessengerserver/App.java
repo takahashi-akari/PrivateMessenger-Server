@@ -36,6 +36,7 @@ import java.io.BufferedWriter;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.util.Collection;
+import java.util.Collections;
 
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
@@ -101,7 +102,7 @@ public class App {
         // run
         try {
             // run
-            kafkaProducer.send(new ProducerRecord<String, String>("test", "test"));
+            kafkaProducer.send(new ProducerRecord<String, String>(Constants.KAFKA_TOPIC_NAME, "test"));
         } catch (Exception e) {
             logger.log(Level.SEVERE, "Exception", e);
         }
@@ -111,7 +112,7 @@ public class App {
         // run
         try {
             // run
-            kafkaConsumer.subscribe(List.of("topic1"));
+            kafkaConsumer.subscribe(List.of(Constants.KAFKA_TOPIC_NAME));
             while (true) {
                 // run
                 ConsumerRecords<String, String> records = kafkaConsumer.poll(Duration.ofSeconds(1));
