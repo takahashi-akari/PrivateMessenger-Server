@@ -130,7 +130,7 @@ public class App {
         // initialize
         try {
             Properties KAFKA_PROPERTIES = new Properties();
-            KAFKA_PROPERTIES.put("bootstrap.servers", "localhost:9092");
+            KAFKA_PROPERTIES.put("bootstrap.servers", "127.0.0.1:9092");
             KAFKA_PROPERTIES.put("group.id", "group1");
             KAFKA_PROPERTIES.put("enable.auto.commit", "true");
             KAFKA_PROPERTIES.put("auto.commit.interval.ms", "1000");
