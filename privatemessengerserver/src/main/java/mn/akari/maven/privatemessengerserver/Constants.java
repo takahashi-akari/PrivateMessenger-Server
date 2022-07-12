@@ -58,8 +58,8 @@ public class Constants {
     public static final String HOST = "127.0.0.1";
     // PORT
     public static final int PORT = 8080;
-    public static Properties KAFKA_CONSUMER_PROPERTIES;
-    public static Properties KAFKA_PRODUCER_PROPERTIES;
+    public static Properties KAFKA_CONSUMER_PROPERTIES = new Properties();
+    public static Properties KAFKA_PRODUCER_PROPERTIES = new Properties();
     public static final Collection<String> KAFKA_CONSUMER_TOPICS;
     public static final String KAFKA_PRODUCER_TOPIC = "topic1";
     public static String KAFKA_PRODUCER_MESSAGE = "";
