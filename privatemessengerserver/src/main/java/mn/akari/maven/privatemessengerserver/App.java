@@ -138,7 +138,7 @@ public class App {
                             // log
                             logger.log(Level.INFO, "kafka producer: {0}", message);
                         }
-                    } catch (InterruptedException e) {
+                    } catch (Exception e) {
                         // log
                         logger.log(Level.SEVERE, e.getMessage(), e);
                     }
