@@ -98,6 +98,16 @@ public class Constants {
         KAFKA_PROPERTIES.put("enable.auto.commit", KAFKA_ENABLE_AUTO_COMMIT);
         KAFKA_PROPERTIES.put("max.poll.records", KAFKA_MAX_POLL_RECORDS);
         KAFKA_PROPERTIES.put("max.poll.interval.ms", KAFKA_MAX_POLL_INTERVAL_MS);
+        KAFKA_PROPERTIES.put("poll.timeout.ms", KAFKA_POLL_TIMEOUT);
+        KAFKA_PROPERTIES.put("acks", "all");
+        KAFKA_PROPERTIES.put("retries", 0);
+        KAFKA_PROPERTIES.put("batch.size", 16384);
+        KAFKA_PROPERTIES.put("linger.ms", 1);
+        KAFKA_PROPERTIES.put("buffer.memory", 33554432);
+        KAFKA_PROPERTIES.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer");
+        KAFKA_PROPERTIES.put("value.serializer", "org.apache.kafka.common.serialization.StringSerializer");
+        KAFKA_PROPERTIES.put("key.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
+        KAFKA_PROPERTIES.put("value.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
     }
     // KAFKA_CONSUMER_PROPERTIES
     static {
