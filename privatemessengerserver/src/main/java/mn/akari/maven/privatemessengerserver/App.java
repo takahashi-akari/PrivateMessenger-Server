@@ -135,6 +135,8 @@ public class App {
             KAFKA_PROPERTIES.put("enable.auto.commit", "true");
             KAFKA_PROPERTIES.put("auto.commit.interval.ms", "1000");
             KAFKA_PROPERTIES.put("session.timeout.ms", "30000");
+            KAFKA_PROPERTIES.put("key.deSerializer","org.apache.kafka.common.serialization.StringSerializer");  
+            KAFKA_PROPERTIES.put("value.deSerializer","org.apache.kafka.common.serialization.StringSerializer");
             KAFKA_PROPERTIES.put("key.deserializer","org.apache.kafka.common.serialization.StringDeserializer");  
             KAFKA_PROPERTIES.put("value.deserializer","org.apache.kafka.common.serialization.StringDeserializer");
             // initialize
