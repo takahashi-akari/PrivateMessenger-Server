@@ -1,5 +1,5 @@
 // @title Private Messenger Server - App
-// @version 0.0.17
+// @version 0.0.18
 // @author Takahashi Akari <akaritakahashioss@gmail.com>
 // @date 2022-07-09
 // @description This is a private messenger server. App.java contains main method.
@@ -62,75 +62,8 @@ public class App {
         initialize();
         // run
         run();
-        // message receive and send loop
-        messageReceiveAndSendLoop();
         // shutdown
         shutdown();
-    }
-
-    private static void messageReceiveAndSendLoop() {
-        // message receive and send loop
-        while (true) {
-            // message receive and send
-            messageReceiveAndSend();
-            // sleep
-            try {
-                Thread.sleep(Constants.SLEEP_TIME);
-            } catch (InterruptedException e) {
-                logger.log(Level.SEVERE, e.getMessage(), e);
-            }
-        }
-    }
-
-    private static void messageReceiveAndSend() {
-        // message receive and send
-        try {
-            // message receive
-            messageReceive();
-            // message send
-            messageSend();
-        } catch(Exception e) {
-            logger.log(Level.SEVERE, e.getMessage(), e);
-        }
-    }
-
-    private static void messageReceive() {
-        // message receive
-        try {
-            // message receive
-            ConsumerRecords<String, String> records = kafkaConsumer.poll(Duration.ofMillis(Constants.SLEEP_TIME));
-            // message receive loop
-            for (ConsumerRecord<String, String> record : records) {
-                // message receive
-                messageReceive(record);
-            }
-        } catch(Exception e) {
-            logger.log(Level.SEVERE, e.getMessage(), e);
-        }
-    }
-
-    private static void messageSend() {
-        // message send
-        try {
-            // get message
-            String message = client.getMessage();
-            // send message
-            kafkaProducer.send(new ProducerRecord<String, String>(Constants.KAFKA_TOPIC, message));
-        } catch (Exception e) {
-            logger.log(Level.SEVERE, e.getMessage(), e);
-        }
-    }
-
-    private static void messageReceive(ConsumerRecord<String, String> record) {
-        // message receive
-        try {
-            // message receive
-            String message = record.value();
-            // message receive
-            client.receiveMessage(message);
-        } catch (Exception e) {
-            logger.log(Level.SEVERE, e.getMessage(), e);
-        }
     }
 
     private static void shutdown() {
@@ -224,8 +157,23 @@ public class App {
             client = new Client();
             // loop
             while (true) {
+                // sleep
+                try {
+                    Thread.sleep(Constants.CLIENT_SLEEP_TIME);
+                } catch (InterruptedException e) {
+                    // log
+                    logger.log(Level.SEVERE, "client: " + e.getMessage());
+                }
+
                 // read message
                 String message = readMessage();
+                // message check
+                if (message == null) {
+                    // error
+                    logger.log(Level.SEVERE, "client: message is null");
+                    // continue
+                    continue;
+                }
                 // send message
                 client.send(message);
             }
@@ -306,39 +254,6 @@ class Client {
         }
     }
 
-    public void receiveMessage(String message) {
-        // log
-        logger.log(Level.INFO, "client: received message: " + message);
-
-        // run
-        try {
-            // run
-            // send message
-            writer.write(message);
-            // flush
-            writer.flush();
-        } catch (Exception e) {
-            // error
-            logger.log(Level.SEVERE, e.getMessage(), e);
-        }
-
-        // log
-        logger.log(Level.INFO, "client: sent message: " + message);
-
-        // run
-        try {
-            // run
-            // sleep
-            Thread.sleep(Constants.CLIENT_SLEEP_TIME);
-        } catch (InterruptedException e) {
-            // error
-            logger.log(Level.SEVERE, e.getMessage(), e);
-        }
-
-        // log
-        logger.log(Level.INFO, "client: sleeping");
-    }
-
     public String getMessage() {
         // run
         try {
@@ -364,6 +279,9 @@ class Client {
             // error
             logger.log(Level.SEVERE, e.getMessage(), e);
         }
+
+        // log
+        logger.log(Level.INFO, "client: sent message: " + message);
     }
 
     private static String readMessage() {

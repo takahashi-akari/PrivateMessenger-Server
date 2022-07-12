@@ -1,5 +1,5 @@
 // @title Private Messenger Server - Constants
-// @version 0.0.17
+// @version 0.0.18
 // @author Takahashi Akari <akaritakahashioss@gmail.com>
 // @date 2022-07-09
 // @description This is a private messenger server. This class contains constants.
