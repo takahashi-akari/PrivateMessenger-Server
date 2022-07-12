@@ -41,7 +41,7 @@ public class Constants {
         add(TOPIC);
     }};
     // KAFKA_SERVER
-    public static final String KAFKA_SERVER = "127.0.0.1:9092";
+    public static final String KAFKA_SERVER = "localhost:9092";
     // KAFKA_CLIENT_ID
     public static final String KAFKA_CLIENT_ID = "client1";
     // KAFKA_GROUP_ID
@@ -55,9 +55,9 @@ public class Constants {
     // KAFKA_MAX_POLL_INTERVAL_MS
     public static final int KAFKA_MAX_POLL_INTERVAL_MS = 100;
     // HOST
-    public static final String HOST = "127.0.0.1";
+    public static final String HOST = "localhost";
     // PORT
-    public static final int PORT = 8080;
+    public static final int PORT = 9092;
     public static Properties KAFKA_CONSUMER_PROPERTIES = new Properties();
     public static Properties KAFKA_PRODUCER_PROPERTIES = new Properties();
     public static final Collection<String> KAFKA_CONSUMER_TOPICS;
@@ -68,20 +68,20 @@ public class Constants {
     public static int KAFKA_PRODUCER_MESSAGE_SIZE = 1024;
     public static final String KAFKA_PRODUCER_TIMEOUT = "5000";
     public static final String KAFKA_PRODUCER_KAFKA_POLL_TIMEOUT = "5000";
-    public static final String KAFKA_PRODUCER_KAFKA_SERVER = "127.0.0.1:9092";
+    public static final String KAFKA_PRODUCER_KAFKA_SERVER = "localhost:9092";
     public static final String KAFKA_PRODUCER_KAFKA_CLIENT_ID = "client1";
     public static final String KAFKA_PRODUCER_KAFKA_GROUP_ID = "group1";
     public static final String KAFKA_PRODUCER_KAFKA_AUTO_OFFSET_RESET = "latest";
     public static final boolean KAFKA_PRODUCER_KAFKA_ENABLE_AUTO_COMMIT = false;
     public static final int KAFKA_PRODUCER_KAFKA_MAX_POLL_RECORDS = 1;
     public static final int KAFKA_PRODUCER_KAFKA_MAX_POLL_INTERVAL_MS = 100;
-    public static final String KAFKA_PRODUCER_HOST = "127.0.0.1";
-    public static final int KAFKA_PRODUCER_PORT = 8080;
+    public static final String KAFKA_PRODUCER_HOST = "localhost";
+    public static final int KAFKA_PRODUCER_PORT = 9092;
     public static String KAFKA_TOPIC = "topic1";
     // SERVER_HOST
-    public static final String SERVER_HOST = "127.0.0.1";
+    public static final String SERVER_HOST = "localhost";
     // SERVER_PORT
-    public static final int SERVER_PORT = 8080;
+    public static final int SERVER_PORT = 9092;
 
     // private static field 
     private static ArrayList<String> KAFKA_PRODUCER_TOPICS;
