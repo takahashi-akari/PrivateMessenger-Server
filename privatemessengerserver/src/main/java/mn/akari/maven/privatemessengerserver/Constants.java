@@ -1,5 +1,5 @@
 // @title Private Messenger Server - Constants
-// @version 0.0.16
+// @version 0.0.17
 // @author Takahashi Akari <akaritakahashioss@gmail.com>
 // @date 2022-07-09
 // @description This is a private messenger server. This class contains constants.
@@ -56,7 +56,7 @@ public class Constants {
     // HOST
     public static final String HOST = "localhost";
     // PORT
-    public static final int PORT = 9092;
+    public static final int PORT = 8080;
     public static Properties KAFKA_CONSUMER_PROPERTIES;
     public static Properties KAFKA_PRODUCER_PROPERTIES;
     public static final Collection<String> KAFKA_CONSUMER_TOPICS;
@@ -71,16 +71,16 @@ public class Constants {
     public static final String KAFKA_PRODUCER_KAFKA_CLIENT_ID = "client1";
     public static final String KAFKA_PRODUCER_KAFKA_GROUP_ID = "group1";
     public static final String KAFKA_PRODUCER_KAFKA_AUTO_OFFSET_RESET = "latest";
-    public static final boolean KAFKA_PRODUCER_KAFKA_ENABLE_AUTO_COMMIT = true;
+    public static final boolean KAFKA_PRODUCER_KAFKA_ENABLE_AUTO_COMMIT = false;
     public static final int KAFKA_PRODUCER_KAFKA_MAX_POLL_RECORDS = 1;
     public static final int KAFKA_PRODUCER_KAFKA_MAX_POLL_INTERVAL_MS = 100;
     public static final String KAFKA_PRODUCER_HOST = "localhost";
-    public static final int KAFKA_PRODUCER_PORT = 9092;
+    public static final int KAFKA_PRODUCER_PORT = 8080;
     public static String KAFKA_TOPIC = "topic1";
     // SERVER_HOST
     public static final String SERVER_HOST = "localhost";
     // SERVER_PORT
-    public static final int SERVER_PORT = 9092;
+    public static final int SERVER_PORT = 8080;
 
     // private static field 
     private static ArrayList<String> KAFKA_PRODUCER_TOPICS;
@@ -88,6 +88,11 @@ public class Constants {
     private static int KAFKA_PRODUCER_MESSAGE_DELAY;
     private static int KAFKA_PRODUCER_MESSAGE_DELAY_RANGE;
     private static double KAFKA_PRODUCER_MESSAGE_DELAY_RANGE_RATIO;
+    public static long KAFKA_CONSUMER_POLL_TIMEOUT = 1000;
+    public static long KAFKA_PRODUCER_SLEEP_TIME = 1000;
+    public static String KAFKA_CONSUMER_TOPIC = "topic1";
+    public static long SLEEP_TIME = 1000;
+    public static long CLIENT_SLEEP_TIME = 1000;
     
     // KAFKA_PROPERTIES
     static {
@@ -109,22 +114,44 @@ public class Constants {
         KAFKA_PROPERTIES.put("key.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
         KAFKA_PROPERTIES.put("value.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
     }
-    // KAFKA_CONSUMER_PROPERTIES
-    static {
-        KAFKA_CONSUMER_PROPERTIES = new Properties();
-        KAFKA_CONSUMER_PROPERTIES.putAll(KAFKA_PROPERTIES);
-        KAFKA_CONSUMER_PROPERTIES.put("auto.offset.reset", "earliest");
-    }
     // KAFKA_CONSUMER_TOPICS
     static {
         KAFKA_CONSUMER_TOPICS = new ArrayList<String>() {{
             add(TOPIC);
         }};
     }
+    // KAFKA_CONSUMER_PROPERTIES
+    static {
+        KAFKA_CONSUMER_PROPERTIES = new Properties();
+        KAFKA_CONSUMER_PROPERTIES.putAll(KAFKA_PROPERTIES);
+        KAFKA_CONSUMER_PROPERTIES.put("auto.offset.reset", "earliest");
+
+        KAFKA_CONSUMER_PROPERTIES.put("topics", KAFKA_CONSUMER_TOPICS);
+
+
+        KAFKA_CONSUMER_PROPERTIES.put("key.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
+        KAFKA_CONSUMER_PROPERTIES.put("value.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
+
+
+        KAFKA_CONSUMER_PROPERTIES.put("auto.offset.reset", "earliest");
+        KAFKA_CONSUMER_PROPERTIES.put("enable.auto.commit", false);
+        KAFKA_CONSUMER_PROPERTIES.put("max.poll.records", 1);
+        KAFKA_CONSUMER_PROPERTIES.put("max.poll.interval.ms", 100);
+        KAFKA_CONSUMER_PROPERTIES.put("poll.timeout.ms", 5000);
+    }
     // KAFKA_PRODUCER_PROPERTIES
     static {
         KAFKA_PRODUCER_PROPERTIES = new Properties();
         KAFKA_PRODUCER_PROPERTIES.putAll(KAFKA_PROPERTIES);
+        KAFKA_PRODUCER_PROPERTIES.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer");
+        KAFKA_PRODUCER_PROPERTIES.put("value.serializer", "org.apache.kafka.common.serialization.StringSerializer");
+        KAFKA_PRODUCER_PROPERTIES.put("key.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
+        KAFKA_PRODUCER_PROPERTIES.put("value.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
+        KAFKA_PRODUCER_PROPERTIES.put("acks", "all");
+        KAFKA_PRODUCER_PROPERTIES.put("retries", 0);
+        KAFKA_PRODUCER_PROPERTIES.put("batch.size", 16384);
+        KAFKA_PRODUCER_PROPERTIES.put("linger.ms", 1);
+        KAFKA_PRODUCER_PROPERTIES.put("buffer.memory", 33554432);
     }
     // KAFKA_PRODUCER_TOPICS
     static {
