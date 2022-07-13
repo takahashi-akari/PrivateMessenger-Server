@@ -1,7 +1,7 @@
 // @title Private Messenger Server - App
-// @version 0.0.20
+// @version 0.0.21
 // @author Takahashi Akari <akaritakahashioss@gmail.com>
-// @date 2022-07-09
+// @date 2022-07-13
 // @description This is a private messenger server. App.java contains main method.
 // @license MIT License
 // @copyright (c) 2022 Takahashi Akari <akaritakahashioss@gmail.com>

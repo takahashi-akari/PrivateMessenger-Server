@@ -1,7 +1,7 @@
 // @title Private Messenger Server - Constants
-// @version 0.0.20
+// @version 0.0.21
 // @author Takahashi Akari <akaritakahashioss@gmail.com>
-// @date 2022-07-09
+// @date 2022-07-13
 // @description This is a private messenger server. This class contains constants.
 // @license MIT License
 // @copyright (c) 2022 Takahashi Akari <akaritakahashioss@gmail.com>
@@ -30,7 +30,7 @@ public class Constants {
     public static final String KAFKA_PRODUCER_KEY = "key1";
     public static final String KAFKA_PRODUCER_VALUE = "value1";
     // PORT
-    public static final int PORT = 8080;
+    public static final int PORT = 9092;
     
     // KAFKA_PROPERTIES
     static {
@@ -48,6 +48,9 @@ public class Constants {
     // KAFKA_CONSUMER_PROPERTIES
     static {
         KAFKA_CONSUMER_PROPERTIES.putAll(KAFKA_PROPERTIES);
+        KAFKA_CONSUMER_PROPERTIES.put("auto.offset.reset", "earliest");
+        KAFKA_CONSUMER_PROPERTIES.put("group.id", "group1");
+
     }
     // KAFKA_PRODUCER_PROPERTIES
     static {
